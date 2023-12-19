@@ -87,7 +87,6 @@ import { useMaskStore } from "../store/mask";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { ExportMessageModal } from "./exporter";
-import { getClientConfig } from "../config/client";
 import { useAllModels } from "../utils/hooks";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
@@ -976,10 +975,8 @@ function _Chat() {
 
   const [showPromptModal, setShowPromptModal] = useState(false);
 
-  const clientConfig = useMemo(() => getClientConfig(), []);
-
   const autoFocus = !isMobileScreen; // wont auto focus on mobile screen
-  const showMaxIcon = !isMobileScreen && !clientConfig?.isApp;
+  const showMaxIcon = !isMobileScreen;
 
   useCommand({
     fill: setUserInput,

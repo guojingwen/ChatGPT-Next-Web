@@ -2,11 +2,8 @@ import { FETCH_COMMIT_URL, FETCH_TAG_URL, StoreKey } from "../constant";
 import { api } from "../client/api";
 import { getClientConfig } from "../config/client";
 import { createPersistStore } from "../utils/store";
-import ChatGptIcon from "../icons/chatgpt.png";
-import Locale from "../locales";
 
 const ONE_MINUTE = 60 * 1000;
-const isApp = !!getClientConfig()?.isApp;
 
 function formatVersionDate(t: string) {
   const d = new Date(+t);
@@ -64,10 +61,7 @@ export const useUpdateStore = createPersistStore(
 
     async getLatestVersion(force = false) {
       const versionType = get().versionType;
-      let version =
-        versionType === "date"
-          ? getClientConfig()?.commitDate
-          : getClientConfig()?.version;
+      let version = versionType === "date" ? getClientConfig()?.commitDate : "";
 
       set(() => ({ version }));
 

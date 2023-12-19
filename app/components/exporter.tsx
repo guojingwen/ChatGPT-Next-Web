@@ -454,8 +454,6 @@ export function ImagePreviewer(props: {
     const dom = previewRef.current;
     if (!dom) return;
 
-    const isApp = getClientConfig()?.isApp;
-
     try {
       const blob = await toPng(dom);
       if (!blob) return;
