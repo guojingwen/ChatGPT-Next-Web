@@ -54,15 +54,10 @@ if ! command -v node >/dev/null || ! command -v git >/dev/null || ! command -v y
 fi
 
 # Clone the repository and install dependencies
-git clone https://github.com/Yidadaa/ChatGPT-Next-Web
+git clone https://github.com/guojingwen/ChatGPT-Next-Web
 cd ChatGPT-Next-Web
 yarn install
 
-# Prompt user for environment variables
-read -p "Enter OPENAI_API_KEY: " OPENAI_API_KEY
-read -p "Enter CODE: " CODE
-read -p "Enter PORT: " PORT
-
 # Build and run the project using the environment variables
-OPENAI_API_KEY=$OPENAI_API_KEY CODE=$CODE PORT=$PORT yarn build
-OPENAI_API_KEY=$OPENAI_API_KEY CODE=$CODE PORT=$PORT yarn start
+yarn build
+yarn start
