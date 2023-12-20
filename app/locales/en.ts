@@ -295,10 +295,6 @@ const en: LocaleType = {
           SubTitle: "Check your api version from azure console",
         },
       },
-      CustomModel: {
-        Title: "Custom Models",
-        SubTitle: "Custom model options, seperated by comma",
-      },
     },
 
     Model: "Model",

@@ -169,12 +169,6 @@ Your openai api key, join multiple api keys with comma.
 
 Override openai api request base url.
 
-### `HIDE_USER_API_KEY` (optional)
-
-> Default: Empty
-
-If you do not want users to input their own API key, set this value to 1.
-
 ### `DISABLE_GPT4` (optional)
 
 > Default: Empty

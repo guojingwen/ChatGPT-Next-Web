@@ -1,5 +1,4 @@
 import md5 from "spark-md5";
-import { DEFAULT_MODELS } from "../constant";
 
 declare global {
   namespace NodeJS {
@@ -43,14 +42,6 @@ export const getServerSideConfig = () => {
   }
 
   const disableGPT4 = !!process.env.DISABLE_GPT4;
-  let customModels = process.env.CUSTOM_MODELS ?? "";
-
-  if (disableGPT4) {
-    if (customModels) customModels += ",";
-    customModels += DEFAULT_MODELS.filter((m) => m.name.startsWith("gpt-4"))
-      .map((m) => "-" + m.name)
-      .join(",");
-  }
 
   const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
   const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
@@ -70,10 +61,8 @@ export const getServerSideConfig = () => {
 
     proxyUrl: process.env.PROXY_URL,
 
-    hideUserApiKey: !!process.env.HIDE_USER_API_KEY,
     disableGPT4,
     hideBalanceQuery: !process.env.ENABLE_BALANCE_QUERY,
     disableFastLink: !!process.env.DISABLE_FAST_LINK,
-    customModels,
   };
 };

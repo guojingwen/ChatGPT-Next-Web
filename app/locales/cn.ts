@@ -291,10 +291,6 @@ const cn = {
           SubTitle: "选择指定的部分版本",
         },
       },
-      CustomModel: {
-        Title: "自定义模型名",
-        SubTitle: "增加自定义模型可选项，使用英文逗号隔开",
-      },
     },
 
     Model: "模型 (model)",

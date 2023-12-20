@@ -86,10 +86,6 @@ OpenAI 接口代理 URL，如果你手动配置了 openai 接口代理，请填�
 
 > 如果遇到 ssl 证书问题，请将 `BASE_URL` 的协议设置为 http。
 
-### `HIDE_USER_API_KEY` （可选）
-
-如果你不想让用户自行填入 API Key，将此环境变量设置为 1 即可。
-
 ### `DISABLE_GPT4` （可选）
 
 如果你不想让用户使用 GPT-4，将此环境变量设置为 1 即可。

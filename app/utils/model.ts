@@ -1,9 +1,6 @@
 import { LLMModel } from "../client/api";
 
-export function collectModelTable(
-  models: readonly LLMModel[],
-  customModels: string,
-) {
+export function collectModelTable(models: readonly LLMModel[]) {
   const modelTable: Record<
     string,
     { available: boolean; name: string; displayName: string }
@@ -17,39 +14,14 @@ export function collectModelTable(
         displayName: m.name,
       }),
   );
-
-  // server custom models
-  customModels
-    .split(",")
-    .filter((v) => !!v && v.length > 0)
-    .map((m) => {
-      const available = !m.startsWith("-");
-      const nameConfig =
-        m.startsWith("+") || m.startsWith("-") ? m.slice(1) : m;
-      const [name, displayName] = nameConfig.split("=");
-
-      // enable or disable all models
-      if (name === "all") {
-        Object.values(modelTable).forEach((m) => (m.available = available));
-      }
-
-      modelTable[name] = {
-        name,
-        displayName: displayName || name,
-        available,
-      };
-    });
   return modelTable;
 }
 
 /**
  * Generate full model table.
  */
-export function collectModels(
-  models: readonly LLMModel[],
-  customModels: string,
-) {
-  const modelTable = collectModelTable(models, customModels);
+export function collectModels(models: readonly LLMModel[]) {
+  const modelTable = collectModelTable(models);
   const allModels = Object.values(modelTable);
 
   return allModels;
