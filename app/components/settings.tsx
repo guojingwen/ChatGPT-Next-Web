@@ -46,7 +46,7 @@ import Locale, {
   changeLang,
   getLang,
 } from "../locales";
-import { copyToClipboard } from "../utils";
+import { copyToClipboard, useMobileScreen } from "../utils";
 import {
   Azure,
   OPENAI_BASE_URL,
@@ -582,9 +582,8 @@ export function Settings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const clientConfig = useMemo(() => getClientConfig(), []);
   const showAccessCode = enabledAccessControl;
-
+  const isMobileScreen = useMobileScreen();
   return (
     <ErrorBoundary>
       <div className="window-header">
@@ -608,23 +607,25 @@ export function Settings() {
       </div>
       <div className={styles["settings"]}>
         <List>
-          <ListItem title={Locale.Settings.SendKey}>
-            <Select
-              value={config.submitKey}
-              onChange={(e) => {
-                updateConfig(
-                  (config) =>
-                    (config.submitKey = e.target.value as any as SubmitKey),
-                );
-              }}
-            >
-              {Object.values(SubmitKey).map((v) => (
-                <option value={v} key={v}>
-                  {v}
-                </option>
-              ))}
-            </Select>
-          </ListItem>
+          {!isMobileScreen ? (
+            <ListItem title={Locale.Settings.SendKey}>
+              <Select
+                value={config.submitKey}
+                onChange={(e) => {
+                  updateConfig(
+                    (config) =>
+                      (config.submitKey = e.target.value as any as SubmitKey),
+                  );
+                }}
+              >
+                {Object.values(SubmitKey).map((v) => (
+                  <option value={v} key={v}>
+                    {v}
+                  </option>
+                ))}
+              </Select>
+            </ListItem>
+          ) : null}
 
           <ListItem title={Locale.Settings.Theme}>
             <Select
@@ -797,7 +798,6 @@ export function Settings() {
               />
             </ListItem>
           )}
-
           {!accessStore.hideUserApiKey && (
             <>
               {
@@ -840,8 +840,7 @@ export function Settings() {
                       ))}
                     </Select>
                   </ListItem>
-
-                  {accessStore.provider === "OpenAI" ? (
+                  {accessStore.provider == "OpenAI" ? (
                     <>
                       <ListItem
                         title={Locale.Settings.Access.OpenAI.Endpoint.Title}
