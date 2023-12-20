@@ -159,14 +159,6 @@ const en: LocaleType = {
       SubTitle: "Newest message will be filled to this template",
     },
 
-    Update: {
-      Version: (x: string) => `Version: ${x}`,
-      IsLatest: "Latest version",
-      CheckUpdate: "Check Update",
-      IsChecking: "Checking update...",
-      FoundUpdate: (x: string) => `Found new version: ${x}`,
-      GoToUpdate: "Update",
-    },
     SendKey: "Send Key",
     Theme: "Theme",
     TightBorder: "Tight Border",
@@ -260,15 +252,6 @@ const en: LocaleType = {
         "Will compress if uncompressed messages length exceeds the value",
     },
 
-    Usage: {
-      Title: "Account Balance",
-      SubTitle(used: any, total: any) {
-        return `Used this month $${used}, subscription $${total}`;
-      },
-      IsChecking: "Checking...",
-      Check: "Check",
-      NoAccess: "Enter API Key to check balance",
-    },
     Access: {
       AccessCode: {
         Title: "Access Code",

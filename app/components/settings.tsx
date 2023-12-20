@@ -25,7 +25,6 @@ import {
   ListItem,
   Modal,
   PasswordInput,
-  Popover,
   Select,
   showConfirm,
   showToast,
@@ -37,7 +36,6 @@ import {
   SubmitKey,
   useChatStore,
   Theme,
-  useUpdateStore,
   useAccessStore,
   useAppConfig,
 } from "../store";
@@ -49,22 +47,18 @@ import Locale, {
   getLang,
 } from "../locales";
 import { copyToClipboard } from "../utils";
-import Link from "next/link";
 import {
   Azure,
   OPENAI_BASE_URL,
   Path,
-  RELEASE_URL,
   STORAGE_KEY,
   ServiceProvider,
   SlotID,
-  UPDATE_URL,
 } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
 import { ErrorBoundary } from "./error";
 import { InputRange } from "./input-range";
 import { useNavigate } from "react-router-dom";
-import { Avatar, AvatarPicker } from "./emoji";
 import { getClientConfig } from "../config/client";
 import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
@@ -559,56 +553,10 @@ function SyncItems() {
 
 export function Settings() {
   const navigate = useNavigate();
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const config = useAppConfig();
   const updateConfig = config.update;
 
-  const updateStore = useUpdateStore();
-  const [checkingUpdate, setCheckingUpdate] = useState(false);
-  const currentVersion = updateStore.formatVersion(updateStore.version);
-  const remoteId = updateStore.formatVersion(updateStore.remoteVersion);
-  const hasNewVersion = currentVersion !== remoteId;
-  const updateUrl = UPDATE_URL;
-
-  function checkUpdate(force = false) {
-    setCheckingUpdate(true);
-    updateStore.getLatestVersion(force).then(() => {
-      setCheckingUpdate(false);
-    });
-
-    console.log("[Update] local version ", updateStore.version);
-    console.log("[Update] remote version ", updateStore.remoteVersion);
-  }
-
   const accessStore = useAccessStore();
-  const shouldHideBalanceQuery = useMemo(() => {
-    const isOpenAiUrl = accessStore.openaiUrl.includes(OPENAI_BASE_URL);
-    return (
-      accessStore.hideBalanceQuery ||
-      isOpenAiUrl ||
-      accessStore.provider === ServiceProvider.Azure
-    );
-  }, [
-    accessStore.hideBalanceQuery,
-    accessStore.openaiUrl,
-    accessStore.provider,
-  ]);
-
-  const usage = {
-    used: updateStore.used,
-    subscription: updateStore.subscription,
-  };
-  const [loadingUsage, setLoadingUsage] = useState(false);
-  function checkUsage(force = false) {
-    if (shouldHideBalanceQuery) {
-      return;
-    }
-
-    setLoadingUsage(true);
-    updateStore.updateUsage(force).finally(() => {
-      setLoadingUsage(false);
-    });
-  }
 
   const enabledAccessControl = useMemo(
     () => accessStore.enabledAccessControl(),
@@ -620,14 +568,6 @@ export function Settings() {
   const builtinCount = SearchService.count.builtin;
   const customCount = promptStore.getUserPrompts().length ?? 0;
   const [shouldShowPromptModal, setShowPromptModal] = useState(false);
-
-  const showUsage = accessStore.isAuthorized();
-  useEffect(() => {
-    // checks per minutes
-    checkUpdate();
-    showUsage && checkUsage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     const keydownEvent = (e: KeyboardEvent) => {
@@ -657,8 +597,6 @@ export function Settings() {
           </div>
         </div>
         <div className="window-actions">
-          <div className="window-action-button"></div>
-          <div className="window-action-button"></div>
           <div className="window-action-button">
             <IconButton
               icon={<CloseIcon />}
@@ -670,53 +608,6 @@ export function Settings() {
       </div>
       <div className={styles["settings"]}>
         <List>
-          <ListItem title={Locale.Settings.Avatar}>
-            <Popover
-              onClose={() => setShowEmojiPicker(false)}
-              content={
-                <AvatarPicker
-                  onEmojiClick={(avatar: string) => {
-                    updateConfig((config) => (config.avatar = avatar));
-                    setShowEmojiPicker(false);
-                  }}
-                />
-              }
-              open={showEmojiPicker}
-            >
-              <div
-                className={styles.avatar}
-                onClick={() => setShowEmojiPicker(true)}
-              >
-                <Avatar avatar={config.avatar} />
-              </div>
-            </Popover>
-          </ListItem>
-
-          <ListItem
-            title={Locale.Settings.Update.Version(currentVersion ?? "unknown")}
-            subTitle={
-              checkingUpdate
-                ? Locale.Settings.Update.IsChecking
-                : hasNewVersion
-                ? Locale.Settings.Update.FoundUpdate(remoteId ?? "ERROR")
-                : Locale.Settings.Update.IsLatest
-            }
-          >
-            {checkingUpdate ? (
-              <LoadingIcon />
-            ) : hasNewVersion ? (
-              <Link href={updateUrl} target="_blank" className="link">
-                {Locale.Settings.Update.GoToUpdate}
-              </Link>
-            ) : (
-              <IconButton
-                icon={<ResetIcon></ResetIcon>}
-                text={Locale.Settings.Update.CheckUpdate}
-                onClick={() => checkUpdate(true)}
-              />
-            )}
-          </ListItem>
-
           <ListItem title={Locale.Settings.SendKey}>
             <Select
               value={config.submitKey}
@@ -1053,32 +944,6 @@ export function Settings() {
               )}
             </>
           )}
-
-          {!shouldHideBalanceQuery ? (
-            <ListItem
-              title={Locale.Settings.Usage.Title}
-              subTitle={
-                showUsage
-                  ? loadingUsage
-                    ? Locale.Settings.Usage.IsChecking
-                    : Locale.Settings.Usage.SubTitle(
-                        usage?.used ?? "[?]",
-                        usage?.subscription ?? "[?]",
-                      )
-                  : Locale.Settings.Usage.NoAccess
-              }
-            >
-              {!showUsage || loadingUsage ? (
-                <div />
-              ) : (
-                <IconButton
-                  icon={<ResetIcon></ResetIcon>}
-                  text={Locale.Settings.Usage.Check}
-                  onClick={() => checkUsage(true)}
-                />
-              )}
-            </ListItem>
-          ) : null}
 
           <ListItem
             title={Locale.Settings.Access.CustomModel.Title}

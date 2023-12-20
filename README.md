@@ -169,24 +169,6 @@ Your openai api key, join multiple api keys with comma.
 
 Override openai api request base url.
 
-### `OPENAI_ORG_ID` (optional)
-
-Specify OpenAI organization ID.
-
-### `AZURE_URL` (optional)
-
-> Example: https://{azure-resource-url}/openai/deployments/{deploy-name}
-
-Azure deploy url.
-
-### `AZURE_API_KEY` (optional)
-
-Azure Api Key.
-
-### `AZURE_API_VERSION` (optional)
-
-Azure Api Version, find it at [Azure Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions).
-
 ### `HIDE_USER_API_KEY` (optional)
 
 > Default: Empty

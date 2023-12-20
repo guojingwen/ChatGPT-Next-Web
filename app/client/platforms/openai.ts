@@ -1,10 +1,8 @@
 import {
   ApiPath,
-  DEFAULT_API_HOST,
   DEFAULT_MODELS,
   OpenaiPath,
   REQUEST_TIMEOUT_MS,
-  ServiceProvider,
 } from "@/app/constant";
 import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
 
@@ -15,8 +13,6 @@ import {
   fetchEventSource,
 } from "@fortaine/fetch-event-source";
 import { prettyObject } from "@/app/utils/format";
-import { getClientConfig } from "@/app/config/client";
-import { makeAzurePath } from "@/app/azure";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -33,15 +29,7 @@ export class ChatGPTApi implements LLMApi {
   path(path: string): string {
     const accessStore = useAccessStore.getState();
 
-    const isAzure = accessStore.provider === ServiceProvider.Azure;
-
-    if (isAzure && !accessStore.isValidAzure()) {
-      throw Error(
-        "incomplete azure config, please check it in your settings page",
-      );
-    }
-
-    let baseUrl = isAzure ? accessStore.azureUrl : accessStore.openaiUrl;
+    let baseUrl = accessStore.openaiUrl;
 
     if (baseUrl.length === 0) {
       baseUrl = ApiPath.OpenAI;
@@ -52,10 +40,6 @@ export class ChatGPTApi implements LLMApi {
     }
     if (!baseUrl.startsWith("http") && !baseUrl.startsWith(ApiPath.OpenAI)) {
       baseUrl = "https://" + baseUrl;
-    }
-
-    if (isAzure) {
-      path = makeAzurePath(path, accessStore.azureApiVersion);
     }
 
     return [baseUrl, path].join("/");

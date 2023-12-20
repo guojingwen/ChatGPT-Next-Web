@@ -55,16 +55,11 @@ export function auth(req: NextRequest) {
 
   // if user does not provide an api key, inject system api key
   if (!apiKey) {
-    const serverApiKey = serverConfig.isAzure
-      ? serverConfig.azureApiKey
-      : serverConfig.apiKey;
+    const serverApiKey = serverConfig.apiKey;
 
     if (serverApiKey) {
       console.log("[Auth] use system api key");
-      req.headers.set(
-        "Authorization",
-        `${serverConfig.isAzure ? "" : "Bearer "}${serverApiKey}`,
-      );
+      req.headers.set("Authorization", `Bearer ${serverApiKey}`);
     } else {
       console.log("[Auth] admin did not provide an api key");
     }

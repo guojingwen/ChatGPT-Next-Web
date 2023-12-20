@@ -86,24 +86,6 @@ OpenAI 接口代理 URL，如果你手动配置了 openai 接口代理，请填�
 
 > 如果遇到 ssl 证书问题，请将 `BASE_URL` 的协议设置为 http。
 
-### `OPENAI_ORG_ID` （可选）
-
-指定 OpenAI 中的组织 ID。
-
-### `AZURE_URL` （可选）
-
-> 形如：https://{azure-resource-url}/openai/deployments/{deploy-name}
-
-Azure 部署地址。
-
-### `AZURE_API_KEY` （可选）
-
-Azure 密钥。
-
-### `AZURE_API_VERSION` （可选）
-
-Azure Api 版本，你可以在这里找到：[Azure 文档](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#chat-completions)。
-
 ### `HIDE_USER_API_KEY` （可选）
 
 如果你不想让用户自行填入 API Key，将此环境变量设置为 1 即可。
@@ -205,6 +187,7 @@ bash <(curl -s https://raw.githubusercontent.com/Yidadaa/ChatGPT-Next-Web/main/s
 [见项目贡献者列表](https://github.com/Yidadaa/ChatGPT-Next-Web/graphs/contributors)
 
 ### 相关项目
+
 - [one-api](https://github.com/songquanpeng/one-api): 一站式大模型额度管理平台，支持市面上所有主流大语言模型
 
 ## 开源协议

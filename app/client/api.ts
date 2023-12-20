@@ -1,5 +1,4 @@
-import { getClientConfig } from "../config/client";
-import { ACCESS_CODE_PREFIX, Azure, ServiceProvider } from "../constant";
+import { ACCESS_CODE_PREFIX } from "../constant";
 import { ChatMessage, ModelType, useAccessStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
@@ -130,11 +129,10 @@ export function getHeaders() {
     "x-requested-with": "XMLHttpRequest",
   };
 
-  const isAzure = accessStore.provider === ServiceProvider.Azure;
-  const authHeader = isAzure ? "api-key" : "Authorization";
-  const apiKey = isAzure ? accessStore.azureApiKey : accessStore.openaiApiKey;
+  const authHeader = "Authorization";
+  const apiKey = accessStore.openaiApiKey;
 
-  const makeBearer = (s: string) => `${isAzure ? "" : "Bearer "}${s.trim()}`;
+  const makeBearer = (s: string) => `Bearer ${s.trim()}`;
   const validString = (x: string) => x && x.length > 0;
 
   // use user's api key first

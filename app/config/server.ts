@@ -10,7 +10,6 @@ declare global {
       CODE?: string;
 
       BASE_URL?: string;
-      OPENAI_ORG_ID?: string; // openai only
 
       BUILD_MODE?: "standalone" | "export";
 
@@ -19,11 +18,6 @@ declare global {
       ENABLE_BALANCE_QUERY?: string; // allow user to query balance or not
       DISABLE_FAST_LINK?: string; // disallow parse settings from url or not
       CUSTOM_MODELS?: string; // to control custom models
-
-      // azure only
-      AZURE_URL?: string; // https://{azure-url}/openai/deployments/{deploy-name}
-      AZURE_API_KEY?: string;
-      AZURE_API_VERSION?: string;
     }
   }
 }
@@ -58,8 +52,6 @@ export const getServerSideConfig = () => {
       .join(",");
   }
 
-  const isAzure = !!process.env.AZURE_URL;
-
   const apiKeyEnvVar = process.env.OPENAI_API_KEY ?? "";
   const apiKeys = apiKeyEnvVar.split(",").map((v) => v.trim());
   const randomIndex = Math.floor(Math.random() * apiKeys.length);
@@ -71,12 +63,6 @@ export const getServerSideConfig = () => {
   return {
     baseUrl: process.env.BASE_URL,
     apiKey,
-    openaiOrgId: process.env.OPENAI_ORG_ID,
-
-    isAzure,
-    azureUrl: process.env.AZURE_URL,
-    azureApiKey: process.env.AZURE_API_KEY,
-    azureApiVersion: process.env.AZURE_API_VERSION,
 
     needCode: ACCESS_CODES.size > 0,
     code: process.env.CODE,
