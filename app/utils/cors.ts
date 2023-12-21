@@ -1,19 +1,3 @@
-import { ApiPath } from "../constant";
-
-export function corsPath(path: string) {
-  const baseUrl = "";
-
-  if (!path.startsWith("/")) {
-    path = "/" + path;
-  }
-
-  if (!path.endsWith("/")) {
-    path += "/";
-  }
-
-  return `${baseUrl}${path}`;
-}
-
 export function corsFetch(
   url: string,
   options: RequestInit & {
@@ -24,7 +8,7 @@ export function corsFetch(
     throw Error("[CORS Fetch] url must starts with http/https");
   }
 
-  let proxyUrl = options.proxyUrl ?? corsPath(ApiPath.Cors);
+  let proxyUrl = options.proxyUrl ?? "";
   if (!proxyUrl.endsWith("/")) {
     proxyUrl += "/";
   }
