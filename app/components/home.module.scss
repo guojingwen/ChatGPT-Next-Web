@@ -204,6 +204,12 @@
   opacity: 0;
   cursor: pointer;
 }
+@media only screen and (max-width: 600px) {
+  .chat-item-delete {
+    opacity: 1;
+    transform: translateX(-4px);
+  }
+}
 
 .chat-item:hover > .chat-item-delete {
   opacity: 0.5;

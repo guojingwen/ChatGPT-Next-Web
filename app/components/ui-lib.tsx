@@ -2,8 +2,6 @@
 import styles from "./ui-lib.module.scss";
 import LoadingIcon from "../icons/three-dots.svg";
 import CloseIcon from "../icons/close.svg";
-import EyeIcon from "../icons/eye.svg";
-import EyeOffIcon from "../icons/eye-off.svg";
 import DownIcon from "../icons/down.svg";
 import ConfirmIcon from "../icons/confirm.svg";
 import CancelIcon from "../icons/cancel.svg";
@@ -13,7 +11,7 @@ import MinIcon from "../icons/min.svg";
 import Locale from "../locales";
 
 import { createRoot } from "react-dom/client";
-import React, { HTMLProps, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IconButton } from "./button";
 
 export function Popover(props: {
@@ -99,6 +97,7 @@ interface ModalProps {
   children?: any;
   actions?: React.ReactNode[];
   defaultMax?: boolean;
+  disableScale?: boolean;
   footer?: React.ReactNode;
   onClose?: () => void;
 }
@@ -130,12 +129,15 @@ export function Modal(props: ModalProps) {
         <div className={styles["modal-title"]}>{props.title}</div>
 
         <div className={styles["modal-header-actions"]}>
-          <div
-            className={styles["modal-header-action"]}
-            onClick={() => setMax(!isMax)}
-          >
-            {isMax ? <MinIcon /> : <MaxIcon />}
-          </div>
+          {!props.disableScale ? (
+            <div
+              className={styles["modal-header-action"]}
+              onClick={() => setMax(!isMax)}
+            >
+              {isMax ? <MinIcon /> : <MaxIcon />}
+            </div>
+          ) : null}
+
           <div
             className={styles["modal-header-action"]}
             onClick={props.onClose}
@@ -269,7 +271,7 @@ export function Select(
   );
 }
 
-export function showConfirm(content: any) {
+export function showConfirm(content: any, disableScale = false) {
   const div = document.createElement("div");
   div.className = "modal-mask";
   document.body.appendChild(div);
@@ -283,6 +285,7 @@ export function showConfirm(content: any) {
   return new Promise<boolean>((resolve) => {
     root.render(
       <Modal
+        disableScale={disableScale}
         title={Locale.UI.Confirm}
         actions={[
           <IconButton

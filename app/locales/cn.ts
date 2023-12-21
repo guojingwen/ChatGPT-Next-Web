@@ -1,5 +1,6 @@
 import { getClientConfig } from "../config/client";
 import { SubmitKey } from "../store/config";
+import { getDeviceInfo } from "../utils";
 
 const cn = {
   WIP: "该功能仍在开发中……",
@@ -52,6 +53,9 @@ const cn = {
     Rename: "重命名对话",
     Typing: "正在输入…",
     Input: (submitKey: string) => {
+      if (getDeviceInfo().isMobile) {
+        return `请输入你的问题\n${submitKey} 发送，/ 触发补全，: 触发命令`;
+      }
       var inputHints = `${submitKey} 发送`;
       if (submitKey === String(SubmitKey.Enter)) {
         inputHints += "，Shift + Enter 换行";

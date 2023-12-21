@@ -1,4 +1,5 @@
 import { SubmitKey } from "../store/config";
+import { getDeviceInfo } from "../utils";
 import { LocaleType } from "./index";
 
 // if you are adding a new translation, please use PartialLocaleType instead of LocaleType
@@ -54,6 +55,9 @@ const en: LocaleType = {
     Rename: "Rename Chat",
     Typing: "Typing…",
     Input: (submitKey: string) => {
+      if (getDeviceInfo().isMobile) {
+        return `please input your question \n${submitKey} to send, / to search prompts, : to use commands`;
+      }
       var inputHints = `${submitKey} to send`;
       if (submitKey === String(SubmitKey.Enter)) {
         inputHints += ", Shift + Enter to wrap";

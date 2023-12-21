@@ -1,5 +1,4 @@
-import DeleteIcon from "../icons/delete.svg";
-import BotIcon from "../icons/bot.svg";
+import DeleteIcon from "../icons/delete1.svg";
 
 import styles from "./home.module.scss";
 import {
@@ -12,7 +11,7 @@ import {
 import { useChatStore } from "../store";
 
 import Locale from "../locales";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { MaskAvatar } from "./mask";
 import { Mask } from "../store/mask";
@@ -151,8 +150,8 @@ export function ChatList(props: { narrow?: boolean }) {
                 }}
                 onDelete={async () => {
                   if (
-                    (!props.narrow && !isMobileScreen) ||
-                    (await showConfirm(Locale.Home.DeleteChat))
+                    !props.narrow ||
+                    (await showConfirm(Locale.Home.DeleteChat, true))
                   ) {
                     chatStore.deleteSession(i);
                   }

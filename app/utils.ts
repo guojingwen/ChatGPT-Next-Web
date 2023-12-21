@@ -177,11 +177,25 @@ export function getCSSVar(varName: string) {
 /**
  * Detects Macintosh
  */
-export function isMacOS(): boolean {
+export function getDeviceInfo(): DeviceInfo {
   if (typeof window !== "undefined") {
-    let userAgent = window.navigator.userAgent.toLocaleLowerCase();
-    const macintosh = /iphone|ipad|ipod|macintosh/.test(userAgent);
-    return !!macintosh;
+    const ua = navigator.userAgent;
+    return {
+      isAndroid: /Android/.test(ua),
+      isIos: /OS\s([\d_]+)/.test(ua),
+      isMobile: /Android|iPhone/i.test(ua),
+      isSafari: /^((?!chrome|android).)*safari/i.test(ua),
+      isMacOS: /iphone|ipad|ipod|macintosh/.test(ua.toLocaleLowerCase()),
+      isWeixin: /MicroMessenger/i.test(navigator.userAgent),
+    };
   }
-  return false;
+  return {} as DeviceInfo;
 }
+type DeviceInfo = {
+  isAndroid: boolean;
+  isIos: boolean;
+  isMobile: boolean;
+  isSafari: boolean;
+  isMacOS: boolean;
+  isWeixin: boolean;
+};
