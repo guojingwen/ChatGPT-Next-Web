@@ -1,17 +1,9 @@
 import { useDebouncedCallback } from "use-debounce";
-import React, {
-  useState,
-  useRef,
-  useEffect,
-  useMemo,
-  useCallback,
-  Fragment,
-} from "react";
+import React, { useState, useRef, useEffect, useMemo, Fragment } from "react";
 
 import SendWhiteIcon from "../icons/send-white.svg";
 import BrainIcon from "../icons/brain.svg";
 import RenameIcon from "../icons/rename.svg";
-import ExportIcon from "../icons/share.svg";
 import ReturnIcon from "../icons/return.svg";
 import CopyIcon from "../icons/copy.svg";
 import LoadingIcon from "../icons/three-dots.svg";
@@ -25,8 +17,6 @@ import SettingsIcon from "../icons/chat-settings.svg";
 import DeleteIcon from "../icons/clear.svg";
 import PinIcon from "../icons/pin.svg";
 import EditIcon from "../icons/rename.svg";
-import ConfirmIcon from "../icons/confirm.svg";
-import CancelIcon from "../icons/cancel.svg";
 
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
@@ -82,11 +72,10 @@ import {
   UNFINISHED_INPUT,
 } from "../constant";
 import { Avatar } from "./emoji";
-import { ContextPrompts, MaskAvatar, MaskConfig } from "./mask";
+import { MaskAvatar, MaskConfig } from "./mask";
 import { useMaskStore } from "../store/mask";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
-import { ExportMessageModal } from "./exporter";
 import { useAllModels } from "../utils/hooks";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
@@ -547,68 +536,6 @@ export function ChatActions(props: {
   );
 }
 
-export function EditMessageModal(props: { onClose: () => void }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
-  const [messages, setMessages] = useState(session.messages.slice());
-
-  return (
-    <div className="modal-mask">
-      <Modal
-        title={Locale.Chat.EditMessage.Title}
-        onClose={props.onClose}
-        actions={[
-          <IconButton
-            text={Locale.UI.Cancel}
-            icon={<CancelIcon />}
-            key="cancel"
-            onClick={() => {
-              props.onClose();
-            }}
-          />,
-          <IconButton
-            type="primary"
-            text={Locale.UI.Confirm}
-            icon={<ConfirmIcon />}
-            key="ok"
-            onClick={() => {
-              chatStore.updateCurrentSession(
-                (session) => (session.messages = messages),
-              );
-              props.onClose();
-            }}
-          />,
-        ]}
-      >
-        <List>
-          <ListItem
-            title={Locale.Chat.EditMessage.Topic.Title}
-            subTitle={Locale.Chat.EditMessage.Topic.SubTitle}
-          >
-            <input
-              type="text"
-              value={session.topic}
-              onInput={(e) =>
-                chatStore.updateCurrentSession(
-                  (session) => (session.topic = e.currentTarget.value),
-                )
-              }
-            ></input>
-          </ListItem>
-        </List>
-        <ContextPrompts
-          context={messages}
-          updateContext={(updater) => {
-            const newMessages = messages.slice();
-            updater(newMessages);
-            setMessages(newMessages);
-          }}
-        />
-      </Modal>
-    </div>
-  );
-}
-
 function _Chat() {
   type RenderMessage = ChatMessage & { preview?: boolean };
 
@@ -616,8 +543,6 @@ function _Chat() {
   const session = chatStore.currentSession();
   const config = useAppConfig();
   const fontSize = config.fontSize;
-
-  const [showExport, setShowExport] = useState(false);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userInput, setUserInput] = useState("");
@@ -1024,9 +949,6 @@ function _Chat() {
     },
   });
 
-  // edit / insert message modal
-  const [isEditingMessage, setIsEditingMessage] = useState(false);
-
   // remember unfinished input
   useEffect(() => {
     // try to load from local storage
@@ -1063,8 +985,9 @@ function _Chat() {
         <div className={`window-header-title ${styles["chat-body-title"]}`}>
           <div
             className={`window-header-main-title ${styles["chat-body-main-title"]}`}
-            onClickCapture={() => setIsEditingMessage(true)}
+            /* onClickCapture={() => setIsEditingMessage(true)} */
           >
+            {/* todo 自己实现弹窗 */}
             {!session.topic ? DEFAULT_TOPIC : session.topic}
           </div>
           <div className="window-header-sub-title">
@@ -1077,20 +1000,10 @@ function _Chat() {
               <IconButton
                 icon={<RenameIcon />}
                 bordered
-                onClick={() => setIsEditingMessage(true)}
+                /* onClick={() => setIsEditingMessage(true)} */
               />
             </div>
           )}
-          <div className="window-action-button">
-            <IconButton
-              icon={<ExportIcon />}
-              bordered
-              title={Locale.Chat.Actions.Export}
-              onClick={() => {
-                setShowExport(true);
-              }}
-            />
-          </div>
           {showMaxIcon && (
             <div className="window-action-button">
               <IconButton
@@ -1302,18 +1215,6 @@ function _Chat() {
           />
         </div>
       </div>
-
-      {showExport && (
-        <ExportMessageModal onClose={() => setShowExport(false)} />
-      )}
-
-      {isEditingMessage && (
-        <EditMessageModal
-          onClose={() => {
-            setIsEditingMessage(false);
-          }}
-        />
-      )}
     </div>
   );
 }

@@ -11,17 +11,9 @@ const en: LocaleType = {
   },
   Chat: {
     SubTitle: (count: number) => `${count} messages`,
-    EditMessage: {
-      Title: "Edit All Messages",
-      Topic: {
-        Title: "Topic",
-        SubTitle: "Change the current topic",
-      },
-    },
     Actions: {
       ChatList: "Go To Chat List",
       CompressedHistory: "Compressed History Memory Prompt",
-      Export: "Export All Messages as Markdown",
       Copy: "Copy",
       Stop: "Stop",
       Retry: "Retry",
