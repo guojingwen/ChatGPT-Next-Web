@@ -5,18 +5,6 @@ import { LocaleType } from "./index";
 
 const en: LocaleType = {
   WIP: "Coming Soon...",
-  Error: {
-    Unauthorized:
-      "Unauthorized access, please enter access code in [auth](/#/auth) page, or enter your OpenAI API Key.",
-  },
-  Auth: {
-    Title: "Need Access Code",
-    Tips: "Please enter access code below",
-    SubTips: "Or enter your OpenAI API Key",
-    Input: "access code",
-    Confirm: "Confirm",
-    Later: "Later",
-  },
   ChatItem: {
     ChatItemCount: (count: number) => `${count} messages`,
   },
@@ -250,51 +238,6 @@ const en: LocaleType = {
       Title: "History Compression Threshold",
       SubTitle:
         "Will compress if uncompressed messages length exceeds the value",
-    },
-
-    Access: {
-      AccessCode: {
-        Title: "Access Code",
-        SubTitle: "Access control Enabled",
-        Placeholder: "Enter Code",
-      },
-      CustomEndpoint: {
-        Title: "Custom Endpoint",
-        SubTitle: "Use custom Azure or OpenAI service",
-      },
-      Provider: {
-        Title: "Model Provider",
-        SubTitle: "Select Azure or OpenAI",
-      },
-      OpenAI: {
-        ApiKey: {
-          Title: "OpenAI API Key",
-          SubTitle: "User custom OpenAI Api Key",
-          Placeholder: "sk-xxx",
-        },
-
-        Endpoint: {
-          Title: "OpenAI Endpoint",
-          SubTitle: "Must starts with http(s):// or use /api/openai as default",
-        },
-      },
-      Azure: {
-        ApiKey: {
-          Title: "Azure Api Key",
-          SubTitle: "Check your api key from Azure console",
-          Placeholder: "Azure Api Key",
-        },
-
-        Endpoint: {
-          Title: "Azure Endpoint",
-          SubTitle: "Example: ",
-        },
-
-        ApiVerion: {
-          Title: "Azure Api Version",
-          SubTitle: "Check your api version from azure console",
-        },
-      },
     },
 
     Model: "Model",

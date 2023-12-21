@@ -1,4 +1,3 @@
-import { ACCESS_CODE_PREFIX } from "../constant";
 import { ChatMessage, ModelType, useAccessStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
@@ -48,7 +47,7 @@ export abstract class LLMApi {
   abstract models(): Promise<LLMModel[]>;
 }
 
-type ProviderName = "openai" | "azure" | "claude" | "palm";
+type ProviderName = "openai" | "claude" | "palm";
 
 interface Model {
   name: string;
@@ -60,7 +59,6 @@ interface ChatProvider {
   name: ProviderName;
   apiConfig: {
     baseUrl: string;
-    apiKey: string;
     summaryModel: Model;
   };
   models: Model[];
@@ -123,29 +121,9 @@ export class ClientApi {
 export const api = new ClientApi();
 
 export function getHeaders() {
-  const accessStore = useAccessStore.getState();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     "x-requested-with": "XMLHttpRequest",
   };
-
-  const authHeader = "Authorization";
-  const apiKey = accessStore.openaiApiKey;
-
-  const makeBearer = (s: string) => `Bearer ${s.trim()}`;
-  const validString = (x: string) => x && x.length > 0;
-
-  // use user's api key first
-  if (validString(apiKey)) {
-    headers[authHeader] = makeBearer(apiKey);
-  } else if (
-    accessStore.enabledAccessControl() &&
-    validString(accessStore.accessCode)
-  ) {
-    headers[authHeader] = makeBearer(
-      ACCESS_CODE_PREFIX + accessStore.accessCode,
-    );
-  }
-
   return headers;
 }

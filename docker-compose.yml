@@ -8,7 +8,6 @@ services:
       - 3000:3000
     environment:
       - OPENAI_API_KEY=$OPENAI_API_KEY
-      - CODE=$CODE
       - BASE_URL=$BASE_URL
       - DISABLE_GPT4=$DISABLE_GPT4
       - ENABLE_BALANCE_QUERY=$ENABLE_BALANCE_QUERY
@@ -23,7 +22,6 @@ services:
       - 3000:3000
     environment:
       - OPENAI_API_KEY=$OPENAI_API_KEY
-      - CODE=$CODE
       - PROXY_URL=$PROXY_URL
       - BASE_URL=$BASE_URL
       - DISABLE_GPT4=$DISABLE_GPT4

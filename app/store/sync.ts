@@ -35,7 +35,6 @@ const DEFAULT_SYNC_STATE = {
   upstash: {
     endpoint: "",
     username: STORAGE_KEY,
-    apiKey: "",
   },
 
   lastSyncTime: 0,

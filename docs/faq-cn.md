@@ -28,13 +28,6 @@ Docker 版本相当于稳定版，latest Docker 总是与 latest release version
 - 找到侧边栏的 Environment Variables 选项；
 - 修改对应的值即可。
 
-## 环境变量 CODE 是什么？必须设置吗？
-
-这是你自定义的访问密码，你可以选择：
-
-1. 不设置，删除该环境变量即可。谨慎：此时任何人可以访问你的项目。
-2. 部署项目时，设置环境变量 CODE（支持多个密码逗号分隔）。设置访问密码后，用户需要在设置界面输入访问密码才可以使用。参见[相关说明](https://github.com/Yidadaa/ChatGPT-Next-Web/blob/main/README_CN.md#%E9%85%8D%E7%BD%AE%E9%A1%B5%E9%9D%A2%E8%AE%BF%E9%97%AE%E5%AF%86%E7%A0%81)
-
 ## 为什么我部署的版本没有流式响应
 
 > 相关讨论：[#386](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/386)
@@ -97,10 +90,6 @@ keepalive_timeout 300;  # 设定keep-alive超时时间为65秒
 
 设置界面 - 模型设置项中，有一项为 `temperature`，如果此值大于 1，那么就有可能造成回复乱码，将其调回 1 以内即可。
 
-## 使用时提示“现在是未授权状态，请在设置页输入访问密码”？
-
-项目通过环境变量 CODE 设置了访问密码。第一次使用时，需要到设置中，输入访问码才可以使用。
-
 ## 使用时提示 "You exceeded your current quota, ..."
 
 API KEY 有问题。余额不足。
@@ -123,6 +112,7 @@ API KEY 有问题。余额不足。
 注意，关闭此特性后，用户会在第一次访问网站时加载所有资源，如果用户网络状况较差，可能会引起较长时间的白屏，从而影响用户使用体验，所以自行考虑。
 
 ## 使用时遇到 "NotFoundError: Failed to execute 'removeChild' on 'Node': The node...."
+
 请关闭浏览器自身的自动翻译功能，并关闭所有自动翻译插件。
 
 # 网络服务相关问题
@@ -192,10 +182,6 @@ OpenAI 只接受指定地区的信用卡（中国信用卡无法使用）。一�
 - GPT-4 的 API 访问需要单独申请。到以下地址填写你的信息进入申请队列 waitlist（准备好你的 OpenAI 组织 ID）：https://openai.com/waitlist/gpt-4-api
   之后等待邮件消息。
 - 开通 ChatGPT Plus 不代表有 GPT-4 权限，两者毫无关系。
-
-## 如何使用 Azure OpenAI 接口
-
-请参考：[#371](https://github.com/Yidadaa/ChatGPT-Next-Web/issues/371)
 
 ## 为什么我的 Token 消耗得这么快？
 

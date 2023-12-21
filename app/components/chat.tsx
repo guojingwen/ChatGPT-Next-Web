@@ -879,9 +879,6 @@ function _Chat() {
     session.messages.at(0)?.content !== BOT_HELLO.content
   ) {
     const copiedHello = Object.assign({}, BOT_HELLO);
-    if (!accessStore.isAuthorized()) {
-      copiedHello.content = Locale.Error.Unauthorized;
-    }
     context.push(copiedHello);
   }
 
@@ -988,7 +985,8 @@ function _Chat() {
       console.log("[Command] got code from url: ", text);
       showConfirm(Locale.URLCommand.Code + `code = ${text}`).then((res) => {
         if (res) {
-          accessStore.update((access) => (access.accessCode = text));
+          // todo
+          // accessStore.update((access) => (access.accessCode = text));
         }
       });
     },
@@ -1010,9 +1008,10 @@ function _Chat() {
           ).then((res) => {
             if (!res) return;
             if (payload.key) {
-              accessStore.update(
+              console.log("------");
+              /* accessStore.update(
                 (access) => (access.openaiApiKey = payload.key!),
-              );
+              ); */
             }
             if (payload.url) {
               accessStore.update((access) => (access.openaiUrl = payload.url!));

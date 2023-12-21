@@ -47,14 +47,7 @@ import Locale, {
   getLang,
 } from "../locales";
 import { copyToClipboard, useMobileScreen } from "../utils";
-import {
-  Azure,
-  OPENAI_BASE_URL,
-  Path,
-  STORAGE_KEY,
-  ServiceProvider,
-  SlotID,
-} from "../constant";
+import { Path, STORAGE_KEY, SlotID } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
 import { ErrorBoundary } from "./error";
 import { InputRange } from "./input-range";
@@ -443,11 +436,11 @@ function SyncConfigModal(props: { onClose?: () => void }) {
             </ListItem>
             <ListItem title={Locale.Settings.Sync.Config.UpStash.Password}>
               <PasswordInput
-                value={syncStore.upstash.apiKey}
                 onChange={(e) => {
-                  syncStore.update(
-                    (config) => (config.upstash.apiKey = e.currentTarget.value),
-                  );
+                  console.log("syncStore.update");
+                  // syncStore.update(
+                  //   (config) => (config.upstash.apiKey = e.currentTarget.value),
+                  // );
                 }}
               ></PasswordInput>
             </ListItem>
@@ -557,12 +550,6 @@ export function Settings() {
 
   const accessStore = useAccessStore();
 
-  const enabledAccessControl = useMemo(
-    () => accessStore.enabledAccessControl(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
   const promptStore = usePromptStore();
   const builtinCount = SearchService.count.builtin;
   const customCount = promptStore.getUserPrompts().length ?? 0;
@@ -581,7 +568,6 @@ export function Settings() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const showAccessCode = enabledAccessControl;
   const isMobileScreen = useMobileScreen();
   return (
     <ErrorBoundary>
@@ -778,166 +764,6 @@ export function Settings() {
             />
           </ListItem>
         </List>
-
-        <List id={SlotID.CustomModel}>
-          {showAccessCode && (
-            <ListItem
-              title={Locale.Settings.Access.AccessCode.Title}
-              subTitle={Locale.Settings.Access.AccessCode.SubTitle}
-            >
-              <PasswordInput
-                value={accessStore.accessCode}
-                type="text"
-                placeholder={Locale.Settings.Access.AccessCode.Placeholder}
-                onChange={(e) => {
-                  accessStore.update(
-                    (access) => (access.accessCode = e.currentTarget.value),
-                  );
-                }}
-              />
-            </ListItem>
-          )}
-          {/* ---------- */}
-          <>
-            {
-              <ListItem
-                title={Locale.Settings.Access.CustomEndpoint.Title}
-                subTitle={Locale.Settings.Access.CustomEndpoint.SubTitle}
-              >
-                <input
-                  type="checkbox"
-                  checked={accessStore.useCustomConfig}
-                  onChange={(e) =>
-                    accessStore.update(
-                      (access) =>
-                        (access.useCustomConfig = e.currentTarget.checked),
-                    )
-                  }
-                ></input>
-              </ListItem>
-            }
-            {accessStore.useCustomConfig && (
-              <>
-                <ListItem
-                  title={Locale.Settings.Access.Provider.Title}
-                  subTitle={Locale.Settings.Access.Provider.SubTitle}
-                >
-                  <Select
-                    value={accessStore.provider}
-                    onChange={(e) => {
-                      accessStore.update(
-                        (access) =>
-                          (access.provider = e.target.value as ServiceProvider),
-                      );
-                    }}
-                  >
-                    {Object.entries(ServiceProvider).map(([k, v]) => (
-                      <option value={v} key={k}>
-                        {k}
-                      </option>
-                    ))}
-                  </Select>
-                </ListItem>
-                {accessStore.provider == "OpenAI" ? (
-                  <>
-                    <ListItem
-                      title={Locale.Settings.Access.OpenAI.Endpoint.Title}
-                      subTitle={Locale.Settings.Access.OpenAI.Endpoint.SubTitle}
-                    >
-                      <input
-                        type="text"
-                        value={accessStore.openaiUrl}
-                        placeholder={OPENAI_BASE_URL}
-                        onChange={(e) =>
-                          accessStore.update(
-                            (access) =>
-                              (access.openaiUrl = e.currentTarget.value),
-                          )
-                        }
-                      ></input>
-                    </ListItem>
-                    <ListItem
-                      title={Locale.Settings.Access.OpenAI.ApiKey.Title}
-                      subTitle={Locale.Settings.Access.OpenAI.ApiKey.SubTitle}
-                    >
-                      <PasswordInput
-                        value={accessStore.openaiApiKey}
-                        type="text"
-                        placeholder={
-                          Locale.Settings.Access.OpenAI.ApiKey.Placeholder
-                        }
-                        onChange={(e) => {
-                          accessStore.update(
-                            (access) =>
-                              (access.openaiApiKey = e.currentTarget.value),
-                          );
-                        }}
-                      />
-                    </ListItem>
-                  </>
-                ) : (
-                  <>
-                    <ListItem
-                      title={Locale.Settings.Access.Azure.Endpoint.Title}
-                      subTitle={
-                        Locale.Settings.Access.Azure.Endpoint.SubTitle +
-                        Azure.ExampleEndpoint
-                      }
-                    >
-                      <input
-                        type="text"
-                        value={accessStore.azureUrl}
-                        placeholder={Azure.ExampleEndpoint}
-                        onChange={(e) =>
-                          accessStore.update(
-                            (access) =>
-                              (access.azureUrl = e.currentTarget.value),
-                          )
-                        }
-                      ></input>
-                    </ListItem>
-                    <ListItem
-                      title={Locale.Settings.Access.Azure.ApiKey.Title}
-                      subTitle={Locale.Settings.Access.Azure.ApiKey.SubTitle}
-                    >
-                      <PasswordInput
-                        value={accessStore.azureApiKey}
-                        type="text"
-                        placeholder={
-                          Locale.Settings.Access.Azure.ApiKey.Placeholder
-                        }
-                        onChange={(e) => {
-                          accessStore.update(
-                            (access) =>
-                              (access.azureApiKey = e.currentTarget.value),
-                          );
-                        }}
-                      />
-                    </ListItem>
-                    <ListItem
-                      title={Locale.Settings.Access.Azure.ApiVerion.Title}
-                      subTitle={Locale.Settings.Access.Azure.ApiVerion.SubTitle}
-                    >
-                      <input
-                        type="text"
-                        value={accessStore.azureApiVersion}
-                        placeholder="2023-08-01-preview"
-                        onChange={(e) =>
-                          accessStore.update(
-                            (access) =>
-                              (access.azureApiVersion = e.currentTarget.value),
-                          )
-                        }
-                      ></input>
-                    </ListItem>
-                  </>
-                )}
-              </>
-            )}
-          </>
-          {/* ------------ */}
-        </List>
-
         <List>
           <ModelConfigList
             modelConfig={config.modelConfig}

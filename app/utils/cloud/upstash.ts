@@ -80,9 +80,7 @@ export function createUpstashClient(store: SyncStore) {
     },
 
     headers() {
-      return {
-        Authorization: `Bearer ${config.apiKey}`,
-      };
+      return {};
     },
     path(path: string) {
       let url = config.endpoint;

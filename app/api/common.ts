@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getServerSideConfig } from "../config/server";
-import { DEFAULT_MODELS, OPENAI_BASE_URL } from "../constant";
-import { collectModelTable } from "../utils/model";
+import { OPENAI_BASE_URL } from "../constant";
 
 const serverConfig = getServerSideConfig();
 

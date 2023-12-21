@@ -27,7 +27,6 @@
 
     根据实际需要，可以选择填写以下选项：
 
-    - `CODE= 可选填，访问密码，可以使用逗号隔开多个密码`
     - `DISABLE_GPT4=1 可选，不让用户使用 GPT-4`
     - `ENABLE_BALANCE_QUERY=1 可选，启用余额查询功能`
     - `DISABLE_FAST_LINK=1 可选，禁用从链接解析预制设置`
