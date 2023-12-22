@@ -23,7 +23,7 @@ import {
 } from "../constant";
 
 import { Link, useNavigate } from "react-router-dom";
-import { isIOS, useMobileScreen } from "../utils";
+import { useMobileScreen, getDeviceInfo } from "../utils";
 import dynamic from "next/dynamic";
 import { showConfirm, showToast } from "./ui-lib";
 
@@ -133,7 +133,7 @@ export function SideBar(props: { className?: string }) {
   const config = useAppConfig();
   const isMobileScreen = useMobileScreen();
   const isIOSMobile = useMemo(
-    () => isIOS() && isMobileScreen,
+    () => getDeviceInfo().isIos && isMobileScreen,
     [isMobileScreen],
   );
 
@@ -224,4 +224,7 @@ export function SideBar(props: { className?: string }) {
       </div>
     </div>
   );
+}
+function getDevices() {
+  throw new Error("Function not implemented.");
 }

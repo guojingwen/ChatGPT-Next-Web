@@ -84,13 +84,23 @@
         flex-wrap: nowrap;
         transition: all ease 0.3s;
       }
+    }
+  }
+}
 
-      @media screen and (max-width: 600px) {
+@media only screen and (max-width: 600px) {
+  .icon-button {
+    padding: 8px;
+  }
+  .mask-page {
+    .mask-page-body {
+      padding: 12px;
+      .mask-item {
+        padding: 12px 12px 8px;
         display: flex;
         flex-direction: column;
-        padding-bottom: 10px;
         border-radius: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
         box-shadow: var(--card-shadow);
 
         &:not(:last-child) {
@@ -100,7 +110,7 @@
         .mask-actions {
           width: 100%;
           justify-content: space-between;
-          padding-top: 10px;
+          padding-top: 2px;
         }
       }
     }

@@ -1,5 +1,13 @@
+.chat-header {
+  justify-content: center;
+}
+.chat-back {
+  position: absolute;
+  left: 10px;
+}
 @media only screen and (max-width: 600px) {
   .chat-body-title {
     text-align: center;
+    align-self: center;
   }
 }

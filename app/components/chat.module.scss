@@ -300,11 +300,6 @@
       flex-wrap: nowrap;
     }
   }
-  @media only screen and (max-width: 600px) {
-    .chat-message-actions {
-      opacity: 1;
-    }
-  }
 }
 
 .chat-message-container {
@@ -318,6 +313,12 @@
       opacity: 1;
       pointer-events: all;
       transform: scale(1) translateY(0);
+    }
+  }
+  @media only screen and (max-width: 600px) {
+    .chat-message-actions {
+      transform: scale(1) translateY(0);
+      opacity: 1;
     }
   }
 }

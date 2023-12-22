@@ -19,9 +19,9 @@ export default function Header() {
   const config = useAppConfig();
 
   return (
-    <div className="window-header">
+    <div className={`window-header ${styles["chat-header"]}`}>
       {isMobileScreen && (
-        <div className="window-actions">
+        <div className={`window-actions ${styles["chat-back"]}`}>
           <div className={"window-action-button"}>
             <IconButton
               icon={<ReturnIcon />}

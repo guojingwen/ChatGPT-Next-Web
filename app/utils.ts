@@ -67,11 +67,6 @@ export function readFromFile() {
   });
 }
 
-export function isIOS() {
-  const userAgent = navigator.userAgent.toLowerCase();
-  return /iphone|ipad|ipod/.test(userAgent);
-}
-
 export function useWindowSize() {
   const [size, setSize] = useState({
     width: window.innerWidth,
@@ -180,13 +175,14 @@ export function getCSSVar(varName: string) {
 export function getDeviceInfo(): DeviceInfo {
   if (typeof window !== "undefined") {
     const ua = navigator.userAgent;
+    const uaL = ua.toLocaleLowerCase();
     return {
       isAndroid: /Android/.test(ua),
-      isIos: /OS\s([\d_]+)/.test(ua),
+      isIos: /iphone|ipad|ipod/.test(uaL),
       isMobile: /Android|iPhone/i.test(ua),
       isSafari: /^((?!chrome|android).)*safari/i.test(ua),
-      isMacOS: /iphone|ipad|ipod|macintosh/.test(ua.toLocaleLowerCase()),
-      isWeixin: /MicroMessenger/i.test(navigator.userAgent),
+      isMacOS: /iphone|ipad|ipod|macintosh/.test(uaL),
+      isWeixin: /MicroMessenger/i.test(ua),
     };
   }
   return {} as DeviceInfo;

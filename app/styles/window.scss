@@ -34,3 +34,19 @@
 .window-action-button:not(:first-child) {
   margin-left: 10px;
 }
+
+@media only screen and (max-width: 600px) {
+  .window-header-title {
+    .window-header-main-title {
+      font-size: 16px;
+    }
+    .window-header-submai-title {
+      font-size: 12px;
+      color: #999;
+    }
+    .window-header-sub-title {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+}

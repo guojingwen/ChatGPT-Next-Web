@@ -5,12 +5,10 @@ import SendWhiteIcon from "../icons/send-white.svg";
 import CopyIcon from "../icons/copy.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import PromptIcon from "../icons/prompt.svg";
-import MaskIcon from "../icons/mask.svg";
 import ResetIcon from "../icons/reload.svg";
 import BreakIcon from "../icons/break.svg";
 import SettingsIcon from "../icons/chat-settings.svg";
 import DeleteIcon from "../icons/clear.svg";
-import EditIcon from "../icons/rename.svg";
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
@@ -22,7 +20,6 @@ import {
   ChatMessage,
   SubmitKey,
   useChatStore,
-  BOT_HELLO,
   createMessage,
   useAccessStore,
   Theme,
@@ -677,14 +674,6 @@ function _Chat() {
   }, [session.mask.context, session.mask.hideContext]);
   const accessStore = useAccessStore();
 
-  if (
-    context.length === 0 &&
-    session.messages.at(0)?.content !== BOT_HELLO.content
-  ) {
-    const copiedHello = Object.assign({}, BOT_HELLO);
-    context.push(copiedHello);
-  }
-
   // preview messages
   const renderMessages = useMemo(() => {
     return context
@@ -880,7 +869,7 @@ function _Chat() {
                 <div className={styles["chat-message-container"]}>
                   <div className={styles["chat-message-header"]}>
                     <div className={styles["chat-message-avatar"]}>
-                      {isUser ? (
+                      {isContext ? null : isUser ? (
                         <Avatar avatar={config.avatar} />
                       ) : (
                         <>

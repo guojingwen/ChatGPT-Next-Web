@@ -288,7 +288,11 @@ pre {
     pointer-events: none;
     opacity: 0;
     transition: all ease 0.3s;
-
+    @media only screen and (max-width: 600px) {
+      pointer-events: all;
+      transform: translateX(0px);
+      opacity: 0.5;
+    }
     &:after {
       content: "copy";
     }

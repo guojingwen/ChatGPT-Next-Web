@@ -37,13 +37,12 @@ import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
 import { useNavigate } from "react-router-dom";
 
 import chatStyle from "./chat.module.scss";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { copyToClipboard, downloadAs, readFromFile } from "../utils";
 import { Updater } from "../typing";
 import { ModelConfigList } from "./model-config";
 import { FileName, Path } from "../constant";
 import { BUILTIN_MASK_STORE } from "../masks";
-import { nanoid } from "nanoid";
 import {
   DragDropContext,
   Droppable,
@@ -439,6 +438,10 @@ export function MaskPage() {
     });
   };
 
+  const customMasks = useMemo(() => {
+    return allMasks.filter((v) => !v.builtin);
+  }, [allMasks]);
+
   return (
     <ErrorBoundary>
       <div className={styles["mask-page"]}>
@@ -453,14 +456,17 @@ export function MaskPage() {
           </div>
 
           <div className="window-actions">
-            <div className="window-action-button">
-              <IconButton
-                icon={<DownloadIcon />}
-                bordered
-                onClick={downloadAll}
-                text={Locale.UI.Export}
-              />
-            </div>
+            {customMasks.length ? (
+              <div className="window-action-button">
+                <IconButton
+                  icon={<DownloadIcon />}
+                  bordered
+                  onClick={downloadAll}
+                  text={Locale.UI.Export}
+                />
+              </div>
+            ) : null}
+
             <div className="window-action-button">
               <IconButton
                 icon={<UploadIcon />}
