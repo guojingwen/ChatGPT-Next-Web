@@ -336,7 +336,6 @@ export const useChatStore = createPersistStore(
       },
 
       getMessagesWithMemory() {
-        debugger;
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const clearContextIndex = session.clearContextIndex ?? 0;

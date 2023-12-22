@@ -2,22 +2,15 @@ import { useDebouncedCallback } from "use-debounce";
 import React, { useState, useRef, useEffect, useMemo, Fragment } from "react";
 
 import SendWhiteIcon from "../icons/send-white.svg";
-import BrainIcon from "../icons/brain.svg";
-import RenameIcon from "../icons/rename.svg";
-import ReturnIcon from "../icons/return.svg";
 import CopyIcon from "../icons/copy.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 import PromptIcon from "../icons/prompt.svg";
 import MaskIcon from "../icons/mask.svg";
-import MaxIcon from "../icons/max.svg";
-import MinIcon from "../icons/min.svg";
 import ResetIcon from "../icons/reload.svg";
 import BreakIcon from "../icons/break.svg";
 import SettingsIcon from "../icons/chat-settings.svg";
 import DeleteIcon from "../icons/clear.svg";
-import PinIcon from "../icons/pin.svg";
 import EditIcon from "../icons/rename.svg";
-
 import LightIcon from "../icons/light.svg";
 import DarkIcon from "../icons/dark.svg";
 import AutoIcon from "../icons/auto.svg";
@@ -34,7 +27,6 @@ import {
   useAccessStore,
   Theme,
   useAppConfig,
-  DEFAULT_TOPIC,
   ModelType,
 } from "../store";
 
@@ -49,19 +41,20 @@ import dynamic from "next/dynamic";
 
 import { ChatControllerPool } from "../client/controller";
 import { Prompt, usePromptStore } from "../store/prompt";
+import { useMaskStore } from "../store/mask";
+
 import Locale from "../locales";
 
 import { IconButton } from "./button";
 import styles from "./chat.module.scss";
 
 import {
-  List,
-  ListItem,
-  Modal,
   Selector,
   showConfirm,
   showPrompt,
   showToast,
+  ListItem,
+  Modal,
 } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
 import {
@@ -73,108 +66,14 @@ import {
 } from "../constant";
 import { Avatar } from "./emoji";
 import { MaskAvatar, MaskConfig } from "./mask";
-import { useMaskStore } from "../store/mask";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { useAllModels } from "../utils/hooks";
+import Header from "./header";
 
 const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
   loading: () => <LoadingIcon />,
 });
-
-export function SessionConfigModel(props: { onClose: () => void }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
-  const maskStore = useMaskStore();
-  const navigate = useNavigate();
-
-  return (
-    <div className="modal-mask">
-      <Modal
-        title={Locale.Context.Edit}
-        onClose={() => props.onClose()}
-        actions={[
-          <IconButton
-            key="reset"
-            icon={<ResetIcon />}
-            bordered
-            text={Locale.Chat.Config.Reset}
-            onClick={async () => {
-              if (await showConfirm(Locale.Memory.ResetConfirm)) {
-                chatStore.updateCurrentSession(
-                  (session) => (session.memoryPrompt = ""),
-                );
-              }
-            }}
-          />,
-          <IconButton
-            key="copy"
-            icon={<CopyIcon />}
-            bordered
-            text={Locale.Chat.Config.SaveAs}
-            onClick={() => {
-              navigate(Path.Masks);
-              setTimeout(() => {
-                maskStore.create(session.mask);
-              }, 500);
-            }}
-          />,
-        ]}
-      >
-        <MaskConfig
-          mask={session.mask}
-          updateMask={(updater) => {
-            const mask = { ...session.mask };
-            updater(mask);
-            chatStore.updateCurrentSession((session) => (session.mask = mask));
-          }}
-          shouldSyncFromGlobal
-          extraListItems={
-            session.mask.modelConfig.sendMemory ? (
-              <ListItem
-                className="copyable"
-                title={`${Locale.Memory.Title} (${session.lastSummarizeIndex} of ${session.messages.length})`}
-                subTitle={session.memoryPrompt || Locale.Memory.EmptyContent}
-              ></ListItem>
-            ) : (
-              <></>
-            )
-          }
-        ></MaskConfig>
-      </Modal>
-    </div>
-  );
-}
-
-function PromptToast(props: {
-  showToast?: boolean;
-  showModal?: boolean;
-  setShowModal: (_: boolean) => void;
-}) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
-  const context = session.mask.context;
-
-  return (
-    <div className={styles["prompt-toast"]} key="prompt-toast">
-      {props.showToast && (
-        <div
-          className={styles["prompt-toast-inner"] + " clickable"}
-          role="button"
-          onClick={() => props.setShowModal(true)}
-        >
-          <BrainIcon />
-          <span className={styles["prompt-toast-content"]}>
-            {Locale.Context.Toast(context.length)}
-          </span>
-        </div>
-      )}
-      {props.showModal && (
-        <SessionConfigModel onClose={() => props.setShowModal(false)} />
-      )}
-    </div>
-  );
-}
 
 function useSubmitHandler() {
   const config = useAppConfig();
@@ -486,14 +385,6 @@ export function ChatActions(props: {
       />
 
       <ChatAction
-        onClick={() => {
-          navigate(Path.Masks);
-        }}
-        text={Locale.Chat.InputActions.Masks}
-        icon={<MaskIcon />}
-      />
-
-      <ChatAction
         text={Locale.Chat.InputActions.Clear}
         icon={<BreakIcon />}
         onClick={() => {
@@ -781,19 +672,6 @@ function _Chat() {
     inputRef.current?.focus();
   };
 
-  const onPinMessage = (message: ChatMessage) => {
-    chatStore.updateCurrentSession((session) =>
-      session.mask.context.push(message),
-    );
-
-    showToast(Locale.Chat.Actions.PinToastContent, {
-      text: Locale.Chat.Actions.PinToastAction,
-      onClick: () => {
-        setShowPromptModal(true);
-      },
-    });
-  };
-
   const context: RenderMessage[] = useMemo(() => {
     return session.mask.hideContext ? [] : session.mask.context.slice();
   }, [session.mask.context, session.mask.hideContext]);
@@ -898,7 +776,6 @@ function _Chat() {
   const [showPromptModal, setShowPromptModal] = useState(false);
 
   const autoFocus = !isMobileScreen; // wont auto focus on mobile screen
-  const showMaxIcon = !isMobileScreen;
 
   useCommand({
     fill: setUserInput,
@@ -968,64 +845,10 @@ function _Chat() {
 
   return (
     <div className={styles.chat} key={session.id}>
-      <div className="window-header">
-        {isMobileScreen && (
-          <div className="window-actions">
-            <div className={"window-action-button"}>
-              <IconButton
-                icon={<ReturnIcon />}
-                bordered
-                title={Locale.Chat.Actions.ChatList}
-                onClick={() => navigate(Path.Home)}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className={`window-header-title ${styles["chat-body-title"]}`}>
-          <div
-            className={`window-header-main-title ${styles["chat-body-main-title"]}`}
-            /* onClickCapture={() => setIsEditingMessage(true)} */
-          >
-            {/* todo 自己实现弹窗 */}
-            {!session.topic ? DEFAULT_TOPIC : session.topic}
-          </div>
-          <div className="window-header-sub-title">
-            {Locale.Chat.SubTitle(session.messages.length)}
-          </div>
-        </div>
-        <div className="window-actions">
-          {!isMobileScreen && (
-            <div className="window-action-button">
-              <IconButton
-                icon={<RenameIcon />}
-                bordered
-                /* onClick={() => setIsEditingMessage(true)} */
-              />
-            </div>
-          )}
-          {showMaxIcon && (
-            <div className="window-action-button">
-              <IconButton
-                icon={config.tightBorder ? <MinIcon /> : <MaxIcon />}
-                bordered
-                onClick={() => {
-                  config.update(
-                    (config) => (config.tightBorder = !config.tightBorder),
-                  );
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        <PromptToast
-          showToast={!hitBottom}
-          showModal={showPromptModal}
-          setShowModal={setShowPromptModal}
-        />
-      </div>
-
+      <Header />
+      {showPromptModal && (
+        <SessionConfigModel onClose={() => setShowPromptModal(false)} />
+      )}
       <div
         className={styles["chat-body"]}
         ref={scrollRef}
@@ -1057,26 +880,6 @@ function _Chat() {
                 <div className={styles["chat-message-container"]}>
                   <div className={styles["chat-message-header"]}>
                     <div className={styles["chat-message-avatar"]}>
-                      <div className={styles["chat-message-edit"]}>
-                        <IconButton
-                          icon={<EditIcon />}
-                          onClick={async () => {
-                            const newMessage = await showPrompt(
-                              Locale.Chat.Actions.Edit,
-                              message.content,
-                              10,
-                            );
-                            chatStore.updateCurrentSession((session) => {
-                              const m = session.mask.context
-                                .concat(session.messages)
-                                .find((m) => m.id === message.id);
-                              if (m) {
-                                m.content = newMessage;
-                              }
-                            });
-                          }}
-                        ></IconButton>
-                      </div>
                       {isUser ? (
                         <Avatar avatar={config.avatar} />
                       ) : (
@@ -1106,22 +909,18 @@ function _Chat() {
                             />
                           ) : (
                             <>
-                              <ChatAction
-                                text={Locale.Chat.Actions.Retry}
-                                icon={<ResetIcon />}
-                                onClick={() => onResend(message)}
-                              />
+                              {!isUser ? (
+                                <ChatAction
+                                  text={Locale.Chat.Actions.Retry}
+                                  icon={<ResetIcon />}
+                                  onClick={() => onResend(message)}
+                                />
+                              ) : null}
 
                               <ChatAction
                                 text={Locale.Chat.Actions.Delete}
                                 icon={<DeleteIcon />}
                                 onClick={() => onDelete(message.id ?? i)}
-                              />
-
-                              <ChatAction
-                                text={Locale.Chat.Actions.Pin}
-                                icon={<PinIcon />}
-                                onClick={() => onPinMessage(message)}
                               />
                               <ChatAction
                                 text={Locale.Chat.Actions.Copy}
@@ -1148,10 +947,6 @@ function _Chat() {
                         !isUser
                       }
                       onContextMenu={(e) => onRightClick(e, message)}
-                      onDoubleClickCapture={() => {
-                        if (!isMobileScreen) return;
-                        setUserInput(message.content);
-                      }}
                       fontSize={fontSize}
                       parentRef={scrollRef}
                       defaultShow={i >= messages.length - 6}
@@ -1170,7 +965,6 @@ function _Chat() {
           );
         })}
       </div>
-
       <div className={styles["chat-input-panel"]}>
         <PromptHints prompts={promptHints} onPromptSelect={onPromptSelect} />
 
@@ -1215,6 +1009,69 @@ function _Chat() {
           />
         </div>
       </div>
+    </div>
+  );
+}
+export function SessionConfigModel(props: { onClose: () => void }) {
+  const chatStore = useChatStore();
+  const session = chatStore.currentSession();
+  const maskStore = useMaskStore();
+  const navigate = useNavigate();
+
+  return (
+    <div className="modal-mask">
+      <Modal
+        title={Locale.Context.Edit}
+        onClose={() => props.onClose()}
+        actions={[
+          <IconButton
+            key="reset"
+            icon={<ResetIcon />}
+            bordered
+            text={Locale.Chat.Config.Reset}
+            onClick={async () => {
+              if (await showConfirm(Locale.Memory.ResetConfirm)) {
+                chatStore.updateCurrentSession(
+                  (session) => (session.memoryPrompt = ""),
+                );
+              }
+            }}
+          />,
+          <IconButton
+            key="copy"
+            icon={<CopyIcon />}
+            bordered
+            text={Locale.Chat.Config.SaveAs}
+            onClick={() => {
+              navigate(Path.Masks);
+              setTimeout(() => {
+                maskStore.create(session.mask);
+              }, 500);
+            }}
+          />,
+        ]}
+      >
+        <MaskConfig
+          mask={session.mask}
+          updateMask={(updater) => {
+            const mask = { ...session.mask };
+            updater(mask);
+            chatStore.updateCurrentSession((session) => (session.mask = mask));
+          }}
+          shouldSyncFromGlobal
+          extraListItems={
+            session.mask.modelConfig.sendMemory ? (
+              <ListItem
+                className="copyable"
+                title={`${Locale.Memory.Title} (${session.lastSummarizeIndex} of ${session.messages.length})`}
+                subTitle={session.memoryPrompt || Locale.Memory.EmptyContent}
+              ></ListItem>
+            ) : (
+              <></>
+            )
+          }
+        ></MaskConfig>
+      </Modal>
     </div>
   );
 }

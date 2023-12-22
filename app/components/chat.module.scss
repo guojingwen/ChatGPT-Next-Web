@@ -260,12 +260,6 @@
   }
 }
 
-@media only screen and (max-width: 600px) {
-  .chat-body-title {
-    text-align: center;
-  }
-}
-
 .chat-message {
   display: flex;
   flex-direction: row;
@@ -306,6 +300,11 @@
       flex-wrap: nowrap;
     }
   }
+  @media only screen and (max-width: 600px) {
+    .chat-message-actions {
+      opacity: 1;
+    }
+  }
 }
 
 .chat-message-container {
@@ -315,10 +314,6 @@
   align-items: flex-start;
 
   &:hover {
-    .chat-message-edit {
-      opacity: 0.9;
-    }
-
     .chat-message-actions {
       opacity: 1;
       pointer-events: all;
@@ -333,30 +328,6 @@
 
 .chat-message-avatar {
   position: relative;
-
-  .chat-message-edit {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: all ease 0.3s;
-
-    button {
-      padding: 7px;
-    }
-  }
-  /* Specific styles for iOS devices */
-  @media screen and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 2) {
-    @supports (-webkit-touch-callout: none) {
-      .chat-message-edit {
-        top: -8%;
-      }
-    }
-  }
 }
 
 .chat-message-status {
