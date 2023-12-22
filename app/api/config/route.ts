@@ -9,7 +9,6 @@ const serverConfig = getServerSideConfig();
 const DANGER_CONFIG = {
   disableGPT4: serverConfig.disableGPT4,
   hideBalanceQuery: serverConfig.hideBalanceQuery,
-  disableFastLink: serverConfig.disableFastLink,
 };
 
 declare global {

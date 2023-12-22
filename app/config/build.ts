@@ -5,8 +5,6 @@ export const getBuildConfig = () => {
     );
   }
 
-  const buildMode = process.env.BUILD_MODE ?? "standalone";
-
   const commitInfo = (() => {
     try {
       const childProcess = require("child_process");
@@ -31,7 +29,6 @@ export const getBuildConfig = () => {
 
   return {
     ...commitInfo,
-    buildMode,
   };
 };
 

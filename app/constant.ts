@@ -3,8 +3,6 @@ export const REPO = "ChatGPT-Next-Web";
 export const ISSUE_URL = `https://github.com/${OWNER}/${REPO}/issues`;
 export const RUNTIME_CONFIG_DOM = "danger-runtime-config";
 
-export const DEFAULT_CORS_HOST = "https://a.nextweb.fun";
-export const DEFAULT_API_HOST = `${DEFAULT_CORS_HOST}/api/proxy`;
 export const OPENAI_BASE_URL = "https://api.openai.com";
 
 export enum Path {

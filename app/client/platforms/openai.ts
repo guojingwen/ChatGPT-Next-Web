@@ -27,13 +27,7 @@ export class ChatGPTApi implements LLMApi {
   private disableListModels = true;
 
   path(path: string): string {
-    const accessStore = useAccessStore.getState();
-
-    let baseUrl = accessStore.openaiUrl;
-
-    if (baseUrl.length === 0) {
-      baseUrl = ApiPath.OpenAI;
-    }
+    let baseUrl: string = ApiPath.OpenAI;
 
     if (baseUrl.endsWith("/")) {
       baseUrl = baseUrl.slice(0, baseUrl.length - 1);
