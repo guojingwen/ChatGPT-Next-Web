@@ -1,11 +1,6 @@
 import { LLMModel } from "../client/api";
 import { getDeviceInfo } from "../utils";
-import {
-  DEFAULT_INPUT_TEMPLATE,
-  DEFAULT_MODELS,
-  DEFAULT_SIDEBAR_WIDTH,
-  StoreKey,
-} from "../constant";
+import { DEFAULT_MODELS, DEFAULT_SIDEBAR_WIDTH, StoreKey } from "../constant";
 import { createPersistStore } from "../utils/store";
 
 export type ModelType = (typeof DEFAULT_MODELS)[number]["name"];
@@ -59,8 +54,6 @@ export const DEFAULT_CONFIG = {
     sendMemory: true,
     historyMessageCount: 4,
     compressMessageLengthThreshold: 1000,
-    enableInjectSystemPrompts: true,
-    template: DEFAULT_INPUT_TEMPLATE,
   },
 };
 
@@ -146,13 +139,8 @@ export const useAppConfig = createPersistStore(
         state.modelConfig.compressMessageLengthThreshold = 1000;
         state.modelConfig.frequency_penalty = 0;
         state.modelConfig.top_p = 1;
-        state.modelConfig.template = DEFAULT_INPUT_TEMPLATE;
         state.dontShowMaskSplashScreen = false;
         state.hideBuiltinMasks = false;
-      }
-
-      if (version < 3.6) {
-        state.modelConfig.enableInjectSystemPrompts = true;
       }
 
       if (version < 3.7) {

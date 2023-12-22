@@ -5,9 +5,7 @@ import { showToast } from "../components/ui-lib";
 import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { createEmptyMask, Mask } from "./mask";
 import {
-  DEFAULT_INPUT_TEMPLATE,
   DEFAULT_SYSTEM_TEMPLATE,
-  KnowledgeCutOffDate,
   StoreKey,
   SUMMARIZE_MODEL,
 } from "../constant";
@@ -87,33 +85,6 @@ function getSummarizeModel(currentModel: string) {
 
 function countMessages(msgs: ChatMessage[]) {
   return msgs.reduce((pre, cur) => pre + estimateTokenLength(cur.content), 0);
-}
-
-function fillTemplateWith(input: string, modelConfig: ModelConfig) {
-  let cutoff =
-    KnowledgeCutOffDate[modelConfig.model] ?? KnowledgeCutOffDate.default;
-
-  const vars = {
-    cutoff,
-    model: modelConfig.model,
-    time: new Date().toLocaleString(),
-    lang: getLang(),
-    input: input,
-  };
-
-  let output = modelConfig.template ?? DEFAULT_INPUT_TEMPLATE;
-
-  // must contains {{input}}
-  const inputVar = "{{input}}";
-  if (!output.includes(inputVar)) {
-    output += "\n" + inputVar;
-  }
-
-  Object.entries(vars).forEach(([name, value]) => {
-    output = output.replaceAll(`{{${name}}}`, value);
-  });
-
-  return output;
 }
 
 const DEFAULT_CHAT_STATE = {
@@ -270,12 +241,9 @@ export const useChatStore = createPersistStore(
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
-        const userContent = fillTemplateWith(content, modelConfig);
-        console.log("[User Input] after template: ", userContent);
-
         const userMessage: ChatMessage = createMessage({
           role: "user",
-          content: userContent,
+          content,
         });
 
         const botMessage: ChatMessage = createMessage({
@@ -368,6 +336,7 @@ export const useChatStore = createPersistStore(
       },
 
       getMessagesWithMemory() {
+        debugger;
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const clearContextIndex = session.clearContextIndex ?? 0;
@@ -376,26 +345,6 @@ export const useChatStore = createPersistStore(
 
         // in-context prompts
         const contextPrompts = session.mask.context.slice();
-
-        // system prompts, to get close to OpenAI Web ChatGPT
-        const shouldInjectSystemPrompts = modelConfig.enableInjectSystemPrompts;
-        const systemPrompts = shouldInjectSystemPrompts
-          ? [
-              createMessage({
-                role: "system",
-                content: fillTemplateWith("", {
-                  ...modelConfig,
-                  template: DEFAULT_SYSTEM_TEMPLATE,
-                }),
-              }),
-            ]
-          : [];
-        if (shouldInjectSystemPrompts) {
-          console.log(
-            "[Global System Prompt] ",
-            systemPrompts.at(0)?.content ?? "empty",
-          );
-        }
 
         // long term memory
         const shouldSendLongTermMemory =
@@ -442,7 +391,6 @@ export const useChatStore = createPersistStore(
 
         // concat all messages
         const recentMessages = [
-          ...systemPrompts,
           ...longTermMemoryPrompts,
           ...contextPrompts,
           ...reversedRecentMessages.reverse(),
@@ -620,23 +568,6 @@ export const useChatStore = createPersistStore(
         newState.sessions.forEach((s) => {
           s.id = nanoid();
           s.messages.forEach((m) => (m.id = nanoid()));
-        });
-      }
-
-      // Enable `enableInjectSystemPrompts` attribute for old sessions.
-      // Resolve issue of old sessions not automatically enabling.
-      if (version < 3.1) {
-        newState.sessions.forEach((s) => {
-          if (
-            // Exclude those already set by user
-            !s.mask.modelConfig.hasOwnProperty("enableInjectSystemPrompts")
-          ) {
-            // Because users may have changed this configuration,
-            // the user's current configuration is used instead of the default
-            const config = useAppConfig.getState();
-            s.mask.modelConfig.enableInjectSystemPrompts =
-              config.modelConfig.enableInjectSystemPrompts;
-          }
         });
       }
 
