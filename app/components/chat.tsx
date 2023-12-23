@@ -15,6 +15,9 @@ import AutoIcon from "../icons/auto.svg";
 import BottomIcon from "../icons/bottom.svg";
 import StopIcon from "../icons/pause.svg";
 import RobotIcon from "../icons/robot.svg";
+import IconKeyboard from "../icons/keyboard.svg";
+import IconVoice from "../icons/voice.svg";
+import IconSelect from "../icons/select.svg";
 
 import {
   ChatMessage,
@@ -112,6 +115,7 @@ function useSubmitHandler() {
 
 export type RenderPompt = Pick<Prompt, "title" | "content">;
 
+/* 快捷指令 */
 export function PromptHints(props: {
   prompts: RenderPompt[];
   onPromptSelect: (prompt: RenderPompt) => void;
@@ -282,14 +286,16 @@ function useScrollToBottom() {
   };
 }
 
+type InputType = "Keyboard" | "Voice";
 export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;
   showPromptHints: () => void;
   hitBottom: boolean;
+  switchInputType: (type: InputType) => void;
+  inputType: InputType;
 }) {
   const config = useAppConfig();
-  const navigate = useNavigate();
   const chatStore = useChatStore();
 
   // switch themes
@@ -393,6 +399,19 @@ export function ChatActions(props: {
         onClick={() => setShowModelSelector(true)}
         text={currentModel}
         icon={<RobotIcon />}
+      />
+      <ChatAction
+        onClick={() =>
+          props.switchInputType(
+            props.inputType === "Keyboard" ? "Voice" : "Keyboard",
+          )
+        }
+        text={
+          Locale.Chat.InputActions[
+            props.inputType === "Keyboard" ? "Voice" : "Keyboard"
+          ]
+        }
+        icon={props.inputType === "Keyboard" ? <IconVoice /> : <IconKeyboard />}
       />
 
       {showModelSelector && (
@@ -787,6 +806,7 @@ function _Chat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [inputType, switchInputType] = useState<InputType>("Keyboard");
   return (
     <div className={styles.chat} key={session.id}>
       <Header />
@@ -913,6 +933,8 @@ function _Chat() {
         <PromptHints prompts={promptHints} onPromptSelect={onPromptSelect} />
 
         <ChatActions
+          inputType={inputType}
+          switchInputType={switchInputType}
           showPromptModal={() => setShowPromptModal(true)}
           scrollToBottom={scrollToBottom}
           hitBottom={hitBottom}
@@ -928,30 +950,38 @@ function _Chat() {
             onSearch("");
           }}
         />
-        <div className={styles["chat-input-panel-inner"]}>
-          <textarea
-            ref={inputRef}
-            className={styles["chat-input"]}
-            placeholder={Locale.Chat.Input(submitKey)}
-            onInput={(e) => onInput(e.currentTarget.value)}
-            value={userInput}
-            onKeyDown={onInputKeyDown}
-            onFocus={scrollToBottom}
-            onClick={scrollToBottom}
-            rows={inputRows}
-            autoFocus={autoFocus}
-            style={{
-              fontSize: config.fontSize,
-            }}
-          />
-          <IconButton
-            icon={<SendWhiteIcon />}
-            text={Locale.Chat.Send}
-            className={styles["chat-input-send"]}
-            type="primary"
-            onClick={() => doSubmit(userInput)}
-          />
-        </div>
+        {inputType === "Keyboard" ? (
+          <div className={styles["chat-input-panel-inner"]}>
+            <textarea
+              ref={inputRef}
+              className={styles["chat-input"]}
+              placeholder={Locale.Chat.Input(submitKey)}
+              onInput={(e) => onInput(e.currentTarget.value)}
+              value={userInput}
+              onKeyDown={onInputKeyDown}
+              onFocus={scrollToBottom}
+              onClick={scrollToBottom}
+              rows={inputRows}
+              autoFocus={autoFocus}
+              style={{
+                fontSize: config.fontSize,
+              }}
+            />
+            <IconButton
+              icon={<SendWhiteIcon />}
+              text={Locale.Chat.Send}
+              className={styles["chat-input-send"]}
+              type="primary"
+              onClick={() => doSubmit(userInput)}
+            />
+          </div>
+        ) : (
+          <div className={styles.chat_voice}>
+            <IconSelect className={styles.chat_voice_icon} />
+            按住说话
+            <IconVoice className={styles.chat_voice_voice} />
+          </div>
+        )}
       </div>
     </div>
   );

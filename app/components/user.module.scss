@@ -1,0 +1,109 @@
+.user {
+}
+.user-header {
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.user-back {
+  position: absolute;
+  left: 10px;
+}
+
+.user_card {
+  height: 130px;
+  padding: 20px 12px 0 12px;
+  box-sizing: border-box;
+  background-color: var(--second);
+  display: flex;
+  width: 100%;
+  color: var(--black);
+  position: relative;
+  font-size: 12px;
+  display: flex;
+  align-items: flex-start;
+}
+.user_card_avatar {
+  flex: none;
+  height: 48px;
+  width: 48px;
+  border-radius: 6px;
+  margin-left: 12px;
+  background-color: var(--gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user_card_info {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  margin-left: 10px;
+  min-height: 48px;
+  font-size: 10px;
+  color: var(--black);
+}
+.user_nickname {
+  font-size: 14px;
+  color: var(--black);
+}
+.user_card_vip {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 48px;
+  background-color: var(--black);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.user_card_vip_text {
+  flex: 1;
+  color: rgb(218, 211, 161);
+  font-size: 12px;
+  font-weight: normal;
+  margin-left: 10px;
+}
+.user_card_vip_buy {
+  flex: none;
+  font-size: 12px;
+  height: 24px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: var(--black);
+  background-image: linear-gradient(
+    to right,
+    rgb(248, 229, 191),
+    rgb(236, 208, 139)
+  );
+}
+
+.user_content {
+  padding: 20px 12px;
+  background-color: var(--gray);
+  color: var(--bar-color);
+}
+.list {
+  padding: 6px;
+  background-color: var(--white);
+  margin-bottom: 12px;
+  border-radius: 6px;
+  color: var(--black);
+  box-shadow: var(--card-shadow);
+}
+.item {
+  padding: 10px;
+  &:not(:nth-of-type(1)) {
+    border-top: var(--border-in-light);
+  }
+}

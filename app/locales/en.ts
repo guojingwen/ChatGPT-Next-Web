@@ -39,6 +39,8 @@ const en: LocaleType = {
       },
       Prompt: "Prompts",
       Clear: "Clear Context",
+      Keyboard: "keyboard",
+      Voice: "voice",
       Settings: "Settings",
     },
     Rename: "Rename Chat",

@@ -448,6 +448,7 @@
 .chat-input-panel-inner {
   display: flex;
   flex: 1;
+  width: 100%;
 }
 
 .chat-input {
@@ -477,6 +478,39 @@
   position: absolute;
   right: 30px;
   bottom: 32px;
+}
+
+.chat_voice {
+  flex: 1;
+  height: 81px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-in-light);
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.03);
+  padding: 10px 14px 10px 14px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  font-size: 20px;
+  position: relative;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    background-color: var(--hover-color);
+    border: var(--primary);
+  }
+}
+.chat_voice_icon {
+  height: 20px;
+  width: 20px;
+  margin-right: 6px;
+}
+.chat_voice_voice {
+  height: 24px;
+  width: 24px;
+  position: absolute;
+  right: 20px;
+  fill: var(--primary);
 }
 
 @media only screen and (max-width: 600px) {

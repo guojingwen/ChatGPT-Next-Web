@@ -2,6 +2,7 @@ import RenameIcon from "../icons/rename.svg";
 import ReturnIcon from "../icons/return.svg";
 import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
+import UserIcon from "../icons/user.svg";
 
 import { useMobileScreen } from "../utils";
 import { DEFAULT_TOPIC, useChatStore, useAppConfig } from "../store";
@@ -75,7 +76,7 @@ export default function Header() {
           {Locale.Chat.SubTitle(session.messages.length)}
         </div>
       </div>
-      <div className="window-actions">
+      <div className={`window-actions ${styles["header-right"]}`}>
         {!isMobileScreen && (
           <div className="window-action-button">
             <IconButton
@@ -89,6 +90,13 @@ export default function Header() {
             />
           </div>
         )}
+        <div className="window-action-button">
+          <IconButton
+            icon={<UserIcon />}
+            bordered
+            onClick={() => navigate(Path.User)}
+          />
+        </div>
       </div>
     </div>
   );

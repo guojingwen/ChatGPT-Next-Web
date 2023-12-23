@@ -9,6 +9,7 @@ import AddIcon from "../icons/add.svg";
 import MaskIcon from "../icons/mask.svg";
 import PluginIcon from "../icons/plugin.svg";
 import DragIcon from "../icons/drag.svg";
+import UserIcon from "../icons/user.svg";
 
 import Locale from "../locales";
 
@@ -196,6 +197,9 @@ export function SideBar(props: { className?: string }) {
           <div className={styles["sidebar-action"]}>
             <Link to={Path.Settings}>
               <IconButton icon={<SettingsIcon />} shadow />
+            </Link>
+            <Link to={Path.User}>
+              <IconButton icon={<UserIcon />} shadow />
             </Link>
           </div>
         </div>

@@ -42,6 +42,10 @@ const Settings = dynamic(async () => (await import("./settings")).Settings, {
   loading: () => <Loading noLogo />,
 });
 
+const User = dynamic(async () => (await import("./user")).User, {
+  loading: () => <Loading noLogo />,
+});
+
 const Chat = dynamic(async () => (await import("./chat")).Chat, {
   loading: () => <Loading noLogo />,
 });
@@ -151,6 +155,7 @@ function Screen() {
           <Route path={Path.Chat} element={<Chat />} />
           {/* <Route path={Path.Error} element={<Error />} /> */}
           <Route path={Path.Settings} element={<Settings />} />
+          <Route path={Path.User} element={<User />} />
         </Routes>
       </div>
     </div>

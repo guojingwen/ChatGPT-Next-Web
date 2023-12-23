@@ -325,6 +325,13 @@
 
 .sidebar-actions {
   display: inline-flex;
+  .sidebar-action {
+    display: inline-flex;
+    align-items: center;
+    :not(:nth-child(1)) {
+      margin-left: 4px;
+    }
+  }
 }
 
 .sidebar-action:not(:last-child) {
