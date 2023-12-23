@@ -1,8 +1,6 @@
 import React from "react";
 import { IconButton } from "./button";
-import GithubIcon from "../icons/github.svg";
 import ResetIcon from "../icons/reload.svg";
-import { ISSUE_URL } from "../constant";
 import Locale from "../locales";
 import { showConfirm } from "./ui-lib";
 import { useSyncStore } from "../store/sync";
@@ -22,6 +20,7 @@ export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     // Update state with error details
     this.setState({ hasError: true, error, info });
+    console.log("上报错误");
   }
 
   clearAndSaveData() {
@@ -38,23 +37,16 @@ export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
       // Render error message
       return (
         <div className="error">
-          <h2>Oops, something went wrong!</h2>
+          <h3>很抱歉，出了一些问题，错误日志已自动上报</h3>
           <pre>
             <code>{this.state.error?.toString()}</code>
             <code>{this.state.info?.componentStack}</code>
           </pre>
 
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <a href={ISSUE_URL} className="report">
-              <IconButton
-                text="Report This Error"
-                icon={<GithubIcon />}
-                bordered
-              />
-            </a>
+          <div style={{ display: "flex", justifyContent: "center" }}>
             <IconButton
               icon={<ResetIcon />}
-              text="Clear All Data"
+              text="清空所有数据"
               onClick={async () => {
                 if (await showConfirm(Locale.Settings.Danger.Reset.Confirm)) {
                   this.clearAndSaveData();

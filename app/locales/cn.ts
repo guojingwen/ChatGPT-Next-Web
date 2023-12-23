@@ -141,6 +141,10 @@ const cn = {
       Title: "自动生成标题",
       SubTitle: "根据对话内容生成合适的标题",
     },
+    Time: {
+      Title: "时间展示",
+      SubTitle: "在聊天页面展示消息时间",
+    },
     Sync: {
       LocalState: "本地数据",
       Overview: (overview: any) => {
@@ -229,7 +233,7 @@ const cn = {
   Context: {
     Toast: (x: any) => `包含 ${x} 条预设提示词`,
     Edit: "当前对话设置",
-    Add: "新增一条对话",
+    Add: "新增一条预设对话",
     Clear: "上下文已清除",
     Revert: "恢复上下文",
   },
@@ -262,8 +266,8 @@ const cn = {
       Clone: "克隆预设",
     },
     Config: {
-      Avatar: "角色头像",
-      Name: "角色名称",
+      Avatar: "AI头像",
+      Name: "会话标题",
       Sync: {
         Title: "使用全局设置",
         SubTitle: "当前对话是否使用全局模型设置",
@@ -286,7 +290,7 @@ const cn = {
     NotShow: "不再展示",
     ConfirmNoShow: "确认禁用？禁用后可以随时在设置中重新启用。",
     Title: "挑选一个面具",
-    SubTitle: "现在开始，与面具背后的灵魂思维碰撞",
+    SubTitle: "面具内置一些AI的指令，让AI扮演某个角色，进而更好的为您服务",
     More: "查看全部",
   },
 

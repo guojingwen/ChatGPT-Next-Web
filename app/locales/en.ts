@@ -143,6 +143,10 @@ const en: LocaleType = {
       Title: "Auto Generate Title",
       SubTitle: "Generate a suitable title based on the conversation content",
     },
+    Time: {
+      Title: "Time display",
+      SubTitle: "Show message time on chat page",
+    },
     Sync: {
       LocalState: "Local Data",
       Overview: (overview: any) => {
@@ -268,8 +272,8 @@ const en: LocaleType = {
       Clone: "Clone",
     },
     Config: {
-      Avatar: "Bot Avatar",
-      Name: "Bot Name",
+      Avatar: "AI Avatar",
+      Name: "Session Title",
       Sync: {
         Title: "Use Global Config",
         SubTitle: "Use global config in this chat",
@@ -290,7 +294,8 @@ const en: LocaleType = {
     Return: "Return",
     Skip: "Just Start",
     Title: "Pick a Mask",
-    SubTitle: "Chat with the Soul behind the Mask",
+    SubTitle:
+      "The mask has some built-in AI commands, allowing the AI to play a certain role and serve you better.",
     More: "Find More",
     NotShow: "Never Show Again",
     ConfirmNoShow: "Confirm to disable？You can enable it in settings later.",

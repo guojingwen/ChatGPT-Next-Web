@@ -283,8 +283,6 @@ export function Settings() {
   const config = useAppConfig();
   const updateConfig = config.update;
 
-  const accessStore = useAccessStore();
-
   const promptStore = usePromptStore();
   const builtinCount = SearchService.count.builtin;
   const customCount = promptStore.getUserPrompts().length ?? 0;
@@ -425,6 +423,20 @@ export function Settings() {
                 updateConfig(
                   (config) =>
                     (config.sendPreviewBubble = e.currentTarget.checked),
+                )
+              }
+            ></input>
+          </ListItem>
+          <ListItem
+            title={Locale.Settings.Time.Title}
+            subTitle={Locale.Settings.Time.SubTitle}
+          >
+            <input
+              type="checkbox"
+              checked={config.showMsgTime}
+              onChange={(e) =>
+                updateConfig(
+                  (config) => (config.showMsgTime = e.currentTarget.checked),
                 )
               }
             ></input>

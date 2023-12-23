@@ -49,6 +49,7 @@
   }
 
   .sub-title {
+    max-width: 80vw;
     animation: slide-in ease 0.4s;
   }
 
@@ -99,6 +100,9 @@
         display: flex;
         align-items: center;
         padding: 10px 14px;
+        @media only screen and (max-width: 600px) {
+          padding: 6px 8px;
+        }
         border: var(--border-in-light);
         box-shadow: var(--card-shadow);
         background-color: var(--white);

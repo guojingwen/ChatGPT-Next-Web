@@ -35,6 +35,7 @@ export const DEFAULT_CONFIG = {
   tightBorder: false,
   sendPreviewBubble: false,
   enableAutoGenerateTitle: true,
+  showMsgTime: false,
   sidebarWidth: DEFAULT_SIDEBAR_WIDTH,
 
   disablePromptHint: false,

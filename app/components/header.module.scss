@@ -12,8 +12,9 @@
   }
 }
 .chat-body-main-title {
-  height: 28px;
+  height: 26px;
   cursor: pointer;
+  margin-bottom: -1px;
   &:hover {
     .chat-header-rename {
       display: inline-block;
@@ -22,7 +23,7 @@
 }
 @media only screen and (max-width: 600px) {
   .chat-header {
-    padding: 12px;
+    padding: 8px 12px;
     justify-content: center;
   }
   .chat-body-title {

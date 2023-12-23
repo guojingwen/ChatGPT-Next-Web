@@ -46,6 +46,10 @@ const Chat = dynamic(async () => (await import("./chat")).Chat, {
   loading: () => <Loading noLogo />,
 });
 
+// const Error = dynamic(async () => (await import("./error")).ErrorBoundary, {
+//   loading: () => <Loading noLogo />,
+// });
+
 const NewChat = dynamic(async () => (await import("./new-chat")).NewChat, {
   loading: () => <Loading noLogo />,
 });
@@ -145,6 +149,7 @@ function Screen() {
           <Route path={Path.NewChat} element={<NewChat />} />
           <Route path={Path.Masks} element={<MaskPage />} />
           <Route path={Path.Chat} element={<Chat />} />
+          {/* <Route path={Path.Error} element={<Error />} /> */}
           <Route path={Path.Settings} element={<Settings />} />
         </Routes>
       </div>

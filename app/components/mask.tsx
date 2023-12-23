@@ -335,7 +335,7 @@ export function ContextPrompts(props: {
                           onClick={() => {
                             addContextPrompt(
                               createMessage({
-                                role: "user",
+                                role: "system",
                                 content: "",
                                 date: new Date().toLocaleString(),
                               }),
