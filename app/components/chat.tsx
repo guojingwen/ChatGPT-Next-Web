@@ -45,14 +45,7 @@ import Locale from "../locales";
 import { IconButton } from "./button";
 import styles from "./chat.module.scss";
 
-import {
-  Selector,
-  showConfirm,
-  showPrompt,
-  showToast,
-  ListItem,
-  Modal,
-} from "./ui-lib";
+import { Selector, showConfirm, showToast, ListItem, Modal } from "./ui-lib";
 import { useNavigate } from "react-router-dom";
 import {
   CHAT_PAGE_SIZE,

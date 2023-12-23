@@ -10,6 +10,7 @@ import Locale from "../locales";
 import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import styles from "./header.module.scss";
+import { useState } from "react";
 
 export default function Header() {
   const isMobileScreen = useMobileScreen();
@@ -17,7 +18,16 @@ export default function Header() {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
   const config = useAppConfig();
+  const [isRename, setIsRename] = useState(false);
 
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    chatStore.updateCurrentSession(
+      (session) => (session.topic = e.target.value),
+    );
+  };
+  const onSave = () => {
+    setIsRename(false);
+  };
   return (
     <div className={`window-header ${styles["chat-header"]}`}>
       {isMobileScreen && (
@@ -36,25 +46,36 @@ export default function Header() {
       <div className={`window-header-title ${styles["chat-body-title"]}`}>
         <div
           className={`window-header-main-title ${styles["chat-body-main-title"]}`}
-          /* onClickCapture={() => setIsEditingMessage(true)} */
+          onClickCapture={() => setIsRename(true)}
         >
-          {/* todo 自己实现弹窗 */}
-          {!session.topic ? DEFAULT_TOPIC : session.topic}
+          {isRename ? (
+            <>
+              <input
+                className={`${styles["header-rename-input"]}`}
+                type="input"
+                value={session.topic || DEFAULT_TOPIC}
+                onInput={onChange}
+                onBlur={onSave}
+              />
+              <button
+                className={`${styles["header-rename-button"]}`}
+                onClick={onSave}
+              >
+                确定
+              </button>
+            </>
+          ) : (
+            <>
+              {!session.topic ? DEFAULT_TOPIC : session.topic}
+              <RenameIcon className={styles["chat-header-rename"]} />
+            </>
+          )}
         </div>
         <div className="window-header-sub-title">
           {Locale.Chat.SubTitle(session.messages.length)}
         </div>
       </div>
       <div className="window-actions">
-        {!isMobileScreen && (
-          <div className="window-action-button">
-            <IconButton
-              icon={<RenameIcon />}
-              bordered
-              /* onClick={() => setIsEditingMessage(true)} */
-            />
-          </div>
-        )}
         {!isMobileScreen && (
           <div className="window-action-button">
             <IconButton

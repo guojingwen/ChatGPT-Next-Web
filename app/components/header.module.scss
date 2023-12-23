@@ -2,6 +2,24 @@
   position: absolute;
   left: 10px;
 }
+.chat-header-rename {
+  margin-left: 2px;
+  display: none;
+  font-weight: bold;
+  color: #999;
+  &:hover {
+    display: inline-block;
+  }
+}
+.chat-body-main-title {
+  height: 28px;
+  cursor: pointer;
+  &:hover {
+    .chat-header-rename {
+      display: inline-block;
+    }
+  }
+}
 @media only screen and (max-width: 600px) {
   .chat-header {
     padding: 12px;
@@ -11,4 +29,15 @@
     text-align: center;
     align-self: center;
   }
+  .chat-header-rename {
+    margin-left: 1px;
+    display: inline-block;
+    transform: scale(0.8);
+  }
+}
+.header-rename-input {
+  text-align: left;
+  margin-right: 4px;
+  margin-bottom: 1px;
+  box-sizing: border-box;
 }

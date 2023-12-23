@@ -1,14 +1,10 @@
 import { trimTopic } from "../utils";
 
-import Locale, { getLang } from "../locales";
+import Locale from "../locales";
 import { showToast } from "../components/ui-lib";
-import { ModelConfig, ModelType, useAppConfig } from "./config";
+import { ModelType, useAppConfig } from "./config";
 import { createEmptyMask, Mask } from "./mask";
-import {
-  DEFAULT_SYSTEM_TEMPLATE,
-  StoreKey,
-  SUMMARIZE_MODEL,
-} from "../constant";
+import { StoreKey, SUMMARIZE_MODEL } from "../constant";
 import { api, RequestMessage } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
@@ -421,7 +417,7 @@ export const useChatStore = createPersistStore(
         const messages = session.messages;
 
         // should summarize topic after chating more than 50 words
-        const SUMMARIZE_MIN_LEN = 50;
+        const SUMMARIZE_MIN_LEN = 30;
         if (
           config.enableAutoGenerateTitle &&
           session.topic === DEFAULT_TOPIC &&

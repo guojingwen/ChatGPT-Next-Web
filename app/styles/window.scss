@@ -39,6 +39,10 @@
   .window-header-title {
     .window-header-main-title {
       font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 70vw;
     }
     .window-header-submai-title {
       font-size: 12px;
