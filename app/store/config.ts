@@ -130,28 +130,10 @@ export const useAppConfig = createPersistStore(
   }),
   {
     name: StoreKey.Config,
-    version: 3.8,
+    version: 3.9, // todo
     migrate(persistedState, version) {
+      // 版本升级
       const state = persistedState as ChatConfig;
-
-      if (version < 3.4) {
-        state.modelConfig.sendMemory = true;
-        state.modelConfig.historyMessageCount = 4;
-        state.modelConfig.compressMessageLengthThreshold = 1000;
-        state.modelConfig.frequency_penalty = 0;
-        state.modelConfig.top_p = 1;
-        state.dontShowMaskSplashScreen = false;
-        state.hideBuiltinMasks = false;
-      }
-
-      if (version < 3.7) {
-        state.enableAutoGenerateTitle = true;
-      }
-
-      if (version < 3.8) {
-        state.lastUpdate = Date.now();
-      }
-
       return state as any;
     },
   },

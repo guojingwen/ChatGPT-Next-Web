@@ -1,5 +1,6 @@
 import { ChatMessage, ModelType, useAccessStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
+import { MyResponse, ResUserInfo, WxResError, WxSign } from "../apiType";
 
 export const ROLES = ["system", "user", "assistant"] as const;
 export type MessageRole = (typeof ROLES)[number];
@@ -40,11 +41,9 @@ export interface LLMModel {
   name: string;
   available: boolean;
 }
-
 export abstract class LLMApi {
   abstract chat(options: ChatOptions): Promise<void>;
   abstract usage(): Promise<LLMUsage>;
-  abstract models(): Promise<LLMModel[]>;
 }
 
 type ProviderName = "openai" | "claude" | "palm";
@@ -79,43 +78,6 @@ export class ClientApi {
   prompts() {}
 
   masks() {}
-
-  async share(messages: ChatMessage[], avatarUrl: string | null = null) {
-    const msgs = messages
-      .map((m) => ({
-        from: m.role === "user" ? "human" : "gpt",
-        value: m.content,
-      }))
-      .concat([
-        {
-          from: "human",
-          value:
-            "Share from [ChatGPT Next Web]: https://github.com/Yidadaa/ChatGPT-Next-Web",
-        },
-      ]);
-    // 敬告二开开发者们，为了开源大模型的发展，请不要修改上述消息，此消息用于后续数据清洗使用
-    // Please do not modify this message
-
-    console.log("[Share]", messages, msgs);
-    const proxyUrl = "/sharegpt";
-    const shareUrl = proxyUrl;
-    const res = await fetch(shareUrl, {
-      body: JSON.stringify({
-        avatarUrl,
-        items: msgs,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    });
-
-    const resJson = await res.json();
-    console.log("[Share]", resJson);
-    if (resJson.id) {
-      return `https://shareg.pt/${resJson.id}`;
-    }
-  }
 }
 
 export const api = new ClientApi();
@@ -126,4 +88,17 @@ export function getHeaders() {
     "x-requested-with": "XMLHttpRequest",
   };
   return headers;
+}
+
+export async function fetchWxAuth(code: string) {
+  const res = await fetch(`/api/wx/auth?code=${code}`, {
+    method: "GET",
+  }).then((res) => res.json());
+  return res as MyResponse<ResUserInfo> | WxResError;
+}
+
+export async function fetchWxJsSdk() {
+  const url = encodeURIComponent(window.location.href.split("#")[0]);
+  const res = await fetch(`/api/wx/jsapi?url=${url}`).then((res) => res.json());
+  return res as WxSign;
 }

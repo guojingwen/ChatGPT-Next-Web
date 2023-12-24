@@ -34,6 +34,10 @@ export default function RootLayout({
         <meta name="config" content={JSON.stringify(getClientConfig())} />
         <link rel="manifest" href="/site.webmanifest"></link>
         <script src="/serviceWorkerRegister.js" defer></script>
+        <script
+          src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"
+          defer
+        ></script>
       </head>
       <body>{children}</body>
     </html>

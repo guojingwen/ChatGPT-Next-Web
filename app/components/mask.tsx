@@ -38,7 +38,7 @@ import { useNavigate } from "react-router-dom";
 
 import chatStyle from "./chat.module.scss";
 import { useMemo, useState } from "react";
-import { copyToClipboard, downloadAs, readFromFile } from "../utils";
+import { downloadAs, readFromFile } from "../utils";
 import { Updater } from "../typing";
 import { ModelConfigList } from "./model-config";
 import { FileName, Path } from "../constant";
@@ -85,11 +85,6 @@ export function MaskConfig(props: {
       // if user changed current session mask, it will disable auto sync
       mask.syncGlobalConfig = false;
     });
-  };
-
-  const copyMaskLink = () => {
-    const maskLink = `${location.protocol}//${location.host}/#${Path.NewChat}?mask=${props.mask.id}`;
-    copyToClipboard(maskLink);
   };
 
   const globalConfig = useAppConfig();
@@ -155,19 +150,6 @@ export function MaskConfig(props: {
             }}
           ></input>
         </ListItem>
-
-        {!props.shouldSyncFromGlobal ? (
-          <ListItem
-            title={Locale.Mask.Config.Share.Title}
-            subTitle={Locale.Mask.Config.Share.SubTitle}
-          >
-            <IconButton
-              icon={<CopyIcon />}
-              text={Locale.Mask.Config.Share.Action}
-              onClick={copyMaskLink}
-            />
-          </ListItem>
-        ) : null}
 
         {props.shouldSyncFromGlobal ? (
           <ListItem

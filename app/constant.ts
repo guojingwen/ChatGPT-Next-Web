@@ -54,7 +54,7 @@ export const OpenaiPath = {
   ChatPath: "v1/chat/completions",
   UsagePath: "dashboard/billing/usage",
   SubsPath: "dashboard/billing/subscription",
-  ListModelPath: "v1/models",
+  ListModelPath: "v1/models", // 暂时不用
 };
 
 export const DEFAULT_SYSTEM_TEMPLATE = `

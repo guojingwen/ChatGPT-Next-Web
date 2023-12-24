@@ -480,9 +480,10 @@
   bottom: 32px;
 }
 
+/* 仅mobile */
 .chat_voice {
   flex: 1;
-  height: 81px;
+  height: 68px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -491,7 +492,7 @@
   padding: 10px 14px 10px 14px;
   border-radius: 10px;
   box-sizing: border-box;
-  font-size: 20px;
+  font-size: 16px;
   position: relative;
   cursor: pointer;
   &:hover,
@@ -501,8 +502,8 @@
   }
 }
 .chat_voice_icon {
-  height: 20px;
-  width: 20px;
+  height: 18px;
+  width: 18px;
   margin-right: 6px;
 }
 .chat_voice_voice {

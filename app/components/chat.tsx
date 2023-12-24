@@ -297,6 +297,7 @@ export function ChatActions(props: {
 }) {
   const config = useAppConfig();
   const chatStore = useChatStore();
+  const isMobileScreen = useMobileScreen();
 
   // switch themes
   const theme = config.theme;
@@ -400,19 +401,23 @@ export function ChatActions(props: {
         text={currentModel}
         icon={<RobotIcon />}
       />
-      <ChatAction
-        onClick={() =>
-          props.switchInputType(
-            props.inputType === "Keyboard" ? "Voice" : "Keyboard",
-          )
-        }
-        text={
-          Locale.Chat.InputActions[
-            props.inputType === "Keyboard" ? "Voice" : "Keyboard"
-          ]
-        }
-        icon={props.inputType === "Keyboard" ? <IconVoice /> : <IconKeyboard />}
-      />
+      {isMobileScreen && (
+        <ChatAction
+          onClick={() =>
+            props.switchInputType(
+              props.inputType === "Keyboard" ? "Voice" : "Keyboard",
+            )
+          }
+          text={
+            Locale.Chat.InputActions[
+              props.inputType === "Keyboard" ? "Voice" : "Keyboard"
+            ]
+          }
+          icon={
+            props.inputType === "Keyboard" ? <IconVoice /> : <IconKeyboard />
+          }
+        />
+      )}
 
       {showModelSelector && (
         <Selector
@@ -978,7 +983,7 @@ function _Chat() {
         ) : (
           <div className={styles.chat_voice}>
             <IconSelect className={styles.chat_voice_icon} />
-            按住说话
+            {Locale.Chat.VoiceTip}
             <IconVoice className={styles.chat_voice_voice} />
           </div>
         )}

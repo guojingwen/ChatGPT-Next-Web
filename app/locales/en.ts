@@ -56,6 +56,7 @@ const en: LocaleType = {
       return inputHints + ", / to search prompts, : to use commands";
     },
     Send: "Send",
+    VoiceTip: "Hold to speak",
     Config: {
       Reset: "Reset to Default",
       SaveAs: "Save as Mask",
@@ -284,11 +285,6 @@ const en: LocaleType = {
       HideContext: {
         Title: "Hide Context Prompts",
         SubTitle: "Do not show in-context prompts in chat",
-      },
-      Share: {
-        Title: "Share This Mask",
-        SubTitle: "Generate a link to this mask",
-        Action: "Copy Link",
       },
     },
   },

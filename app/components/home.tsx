@@ -28,6 +28,7 @@ import { useAppConfig } from "../store/config";
 import { getClientConfig } from "../config/client";
 import { api } from "../client/api";
 import { useAccessStore } from "../store";
+import { initWx } from "../utils/wxUtils";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -114,19 +115,6 @@ const useHasHydrated = () => {
   return hasHydrated;
 };
 
-const loadAsyncGoogleFont = () => {
-  const linkEl = document.createElement("link");
-  const proxyFontUrl = "/google-fonts";
-  const googleFontUrl = proxyFontUrl;
-  linkEl.rel = "stylesheet";
-  linkEl.href =
-    googleFontUrl +
-    "/css2?family=" +
-    encodeURIComponent("Noto Sans:wght@300;400;700;900") +
-    "&display=swap";
-  document.head.appendChild(linkEl);
-};
-
 function Screen() {
   const config = useAppConfig();
   const location = useLocation();
@@ -135,7 +123,7 @@ function Screen() {
   const shouldTightBorder = config.tightBorder && !isMobileScreen;
 
   useEffect(() => {
-    loadAsyncGoogleFont();
+    initWx();
   }, []);
 
   return (
@@ -162,21 +150,8 @@ function Screen() {
   );
 }
 
-export function useLoadData() {
-  const config = useAppConfig();
-
-  useEffect(() => {
-    (async () => {
-      const models = await api.llm.models();
-      config.mergeModels(models);
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-}
-
 export function Home() {
   useSwitchTheme();
-  useLoadData();
   useHtmlLang();
 
   useEffect(() => {

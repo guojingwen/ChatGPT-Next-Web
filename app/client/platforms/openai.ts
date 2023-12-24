@@ -6,8 +6,7 @@ import {
 } from "@/app/constant";
 import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
 
-import { ChatOptions, getHeaders, LLMApi, LLMModel, LLMUsage } from "../api";
-import Locale from "../../locales";
+import { ChatOptions, getHeaders, LLMApi, LLMUsage } from "../api";
 import {
   EventStreamContentType,
   fetchEventSource,
@@ -24,8 +23,6 @@ export interface OpenAIListModelResponse {
 }
 
 export class ChatGPTApi implements LLMApi {
-  private disableListModels = true;
-
   path(path: string): string {
     let baseUrl: string = ApiPath.OpenAI;
 
@@ -267,32 +264,6 @@ export class ChatGPTApi implements LLMApi {
       used: response.total_usage,
       total: total.hard_limit_usd,
     } as LLMUsage;
-  }
-
-  async models(): Promise<LLMModel[]> {
-    if (this.disableListModels) {
-      return DEFAULT_MODELS.slice();
-    }
-
-    const res = await fetch(this.path(OpenaiPath.ListModelPath), {
-      method: "GET",
-      headers: {
-        ...getHeaders(),
-      },
-    });
-
-    const resJson = (await res.json()) as OpenAIListModelResponse;
-    const chatModels = resJson.data?.filter((m) => m.id.startsWith("gpt-"));
-    console.log("[Models]", chatModels);
-
-    if (!chatModels) {
-      return [];
-    }
-
-    return chatModels.map((m) => ({
-      name: m.id,
-      available: true,
-    }));
   }
 }
 export { OpenaiPath };

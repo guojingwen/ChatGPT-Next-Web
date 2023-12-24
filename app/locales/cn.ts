@@ -32,8 +32,8 @@ const cn = {
       ToBottom: "滚到最新",
       Theme: {
         auto: "自动主题",
-        light: "亮色模式",
-        dark: "深色模式",
+        light: "白天模式",
+        dark: "晚上模式",
       },
       Prompt: "快捷指令",
       Clear: "清除聊天",
@@ -54,6 +54,7 @@ const cn = {
       return inputHints + "，/ 触发补全，: 触发命令";
     },
     Send: "发送",
+    VoiceTip: "按住说话",
     Config: {
       Reset: "清除记忆",
       SaveAs: "存为面具",
@@ -123,7 +124,7 @@ const cn = {
       },
     },
     Lang: {
-      Name: "Language", // ATTENTION: if you wanna add a new translation, please do not translate this value, leave it as `Language`
+      Name: "语言", // ATTENTION: if you wanna add a new translation, please do not translate this value, leave it as `Language`
       All: "所有语言",
     },
     Avatar: "头像",
@@ -278,11 +279,6 @@ const cn = {
       HideContext: {
         Title: "隐藏预设对话",
         SubTitle: "隐藏后预设对话不会出现在聊天界面",
-      },
-      Share: {
-        Title: "分享此面具",
-        SubTitle: "生成此面具的直达链接",
-        Action: "复制链接",
       },
     },
   },

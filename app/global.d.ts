@@ -10,4 +10,11 @@ declare module "*.scss" {
 
 declare module "*.svg";
 
-declare interface Window {}
+declare interface Window {
+  wx: Wx;
+  wxPromise: Promise<Wx>;
+}
+
+declare interface Wx {
+  [key: string]: any;
+}

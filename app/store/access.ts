@@ -1,6 +1,5 @@
 import { StoreKey } from "../constant";
 import { getHeaders } from "../client/api";
-import { getClientConfig } from "../config/client";
 import { createPersistStore } from "../utils/store";
 
 let fetchState = 0; // 0 not fetch, 1 fetching, 2 done
@@ -11,6 +10,7 @@ const DEFAULT_ACCESS_STATE = {
   disableGPT4: false,
 };
 
+// todo改造为登录
 export const useAccessStore = createPersistStore(
   { ...DEFAULT_ACCESS_STATE },
 
@@ -42,14 +42,6 @@ export const useAccessStore = createPersistStore(
     name: StoreKey.Access,
     version: 2,
     migrate(persistedState, version) {
-      if (version < 2) {
-        const state = persistedState as {
-          token: string;
-          openaiApiKey: string;
-        };
-        state.openaiApiKey = state.token;
-      }
-
       return persistedState as any;
     },
   },
