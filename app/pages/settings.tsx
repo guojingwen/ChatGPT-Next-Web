@@ -30,12 +30,11 @@ import Locale, {
   changeLang,
   getLang,
 } from "../locales";
-import { copyToClipboard, useMobileScreen } from "../utils";
+import { copyToClipboard, useMobileScreen, useNavigate } from "../utils";
 import { Path } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
 import { ErrorBoundary } from "../components/error";
 import { InputRange } from "../components/input-range";
-import { useNavigate } from "react-router-dom";
 import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";

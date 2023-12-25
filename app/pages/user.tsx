@@ -1,9 +1,8 @@
 import styles from "./user.module.scss";
-import { useMobileScreen } from "../utils";
+import { useMobileScreen, useNavigate } from "../utils";
 import Locale from "../locales";
 import { IconButton } from "../components/button";
 import ReturnIcon from "../icons/return.svg";
-import { useNavigate } from "react-router-dom";
 import VIP from "../icons/vip.svg";
 import UserAvatar from "../icons/user-avatar.svg";
 import { useState } from "react";

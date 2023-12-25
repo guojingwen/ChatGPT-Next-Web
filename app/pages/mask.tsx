@@ -34,11 +34,10 @@ import {
 } from "../components/ui-lib";
 import { Avatar, AvatarPicker } from "../components/emoji";
 import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
-import { useNavigate } from "react-router-dom";
 
 import chatStyle from "./chat.module.scss";
 import { useMemo, useState } from "react";
-import { downloadAs, readFromFile } from "../utils";
+import { downloadAs, readFromFile, useNavigate } from "../utils";
 import { Updater } from "../typing";
 import { ModelConfigList } from "../components/model-config";
 import { FileName, Path } from "../constant";

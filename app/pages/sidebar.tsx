@@ -24,8 +24,8 @@ import {
   Path,
 } from "../constant";
 
-import { Link, useNavigate } from "react-router-dom";
-import { useMobileScreen, getDeviceInfo } from "../utils";
+import { Link } from "react-router-dom";
+import { useMobileScreen, getDeviceInfo, useNavigate } from "../utils";
 import dynamic from "next/dynamic";
 import { showToast } from "../components/ui-lib";
 
@@ -172,9 +172,9 @@ export function SideBar(props: { className?: string }) {
           className={styles["sidebar-bar-button"]}
           onClick={() => {
             if (config.dontShowMaskSplashScreen !== true) {
-              navigate(Path.NewChat, { state: { fromHome: true } });
+              navigate(`${Path.NewChat}?fromHome=1`);
             } else {
-              navigate(Path.Masks, { state: { fromHome: true } });
+              navigate(Path.Masks);
             }
           }}
           shadow

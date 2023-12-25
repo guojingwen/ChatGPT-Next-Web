@@ -8,7 +8,7 @@ import LeftIcon from "../icons/left.svg";
 import LightningIcon from "../icons/lightning.svg";
 import EyeIcon from "../icons/eye.svg";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { Mask, useMaskStore } from "../store/mask";
 import Locale from "../locales";
 import { useAppConfig, useChatStore } from "../store";
@@ -16,6 +16,7 @@ import { useCommand } from "../command";
 import { showConfirm } from "../components/ui-lib";
 import { BUILTIN_MASK_STORE } from "../masks";
 import MaskAvatar from "../components/mask-avatar";
+import { useNavigate } from "../utils";
 
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
@@ -83,7 +84,8 @@ export function NewChat() {
 
   const maskRef = useRef<HTMLDivElement>(null);
 
-  const { state } = useLocation();
+  const [sParam] = useSearchParams();
+  const isFromHome = !!sParam.get("fromHome");
 
   const startChat = (mask?: Mask) => {
     setTimeout(() => {
@@ -118,7 +120,7 @@ export function NewChat() {
           text={Locale.NewChat.Return}
           onClick={() => navigate(Path.Home)}
         ></IconButton>
-        {!state?.fromHome && (
+        {isFromHome && (
           <IconButton
             text={Locale.NewChat.NotShow}
             onClick={async () => {

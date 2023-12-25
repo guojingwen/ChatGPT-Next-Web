@@ -189,3 +189,26 @@ export function getDeviceInfo(): DeviceInfo {
   }
   return {} as DeviceInfo;
 }
+
+/* react-router 与 next/route冲突，故自定义useNavigate */
+const stack: string[] = [];
+export function useNavigate() {
+  return (path: string | number) => {
+    if (path === -1) {
+      if (stack.length) {
+        stack.pop();
+        history.back();
+      } else {
+        const isHome = !(
+          location.hash === "#/" || location.hash.startsWith("#/?")
+        );
+        if (!isHome) {
+          location.href = `#/`;
+        }
+      }
+    } else {
+      stack.push(path as string);
+      location.href = `#${path}`;
+    }
+  };
+}

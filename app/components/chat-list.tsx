@@ -11,12 +11,11 @@ import {
 import { ModelType, useChatStore } from "../store";
 
 import Locale from "../locales";
-import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import { DEFAULT_MASK_AVATAR, Mask } from "../store/mask";
 import { useRef, useEffect } from "react";
 import { showConfirm } from "./ui-lib";
-import { useMobileScreen } from "../utils";
+import { useMobileScreen, useNavigate } from "../utils";
 import MaskAvatar from "./mask-avatar";
 
 export function ChatItem(props: {

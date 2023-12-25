@@ -4,11 +4,10 @@ import MaxIcon from "../icons/max.svg";
 import MinIcon from "../icons/min.svg";
 import UserIcon from "../icons/user.svg";
 
-import { useMobileScreen } from "../utils";
+import { useMobileScreen, useNavigate } from "../utils";
 import { DEFAULT_TOPIC, useChatStore, useAppConfig } from "../store";
 import { IconButton } from "./button";
 import Locale from "../locales";
-import { useNavigate } from "react-router-dom";
 import { Path } from "../constant";
 import styles from "./header.module.scss";
 import { useState } from "react";

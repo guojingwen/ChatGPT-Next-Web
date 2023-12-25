@@ -35,12 +35,13 @@ import {
   selectOrCopy,
   autoGrowTextArea,
   useMobileScreen,
+  useNavigate,
 } from "../utils";
 
 import dynamic from "next/dynamic";
 
 import { ChatControllerPool } from "../client/controller";
-import { Prompt, usePromptStore } from "../store/prompt";
+import { usePromptStore } from "../store/prompt";
 import { useMaskStore } from "../store/mask";
 
 import Locale from "../locales";
@@ -55,7 +56,6 @@ import {
   ListItem,
   Modal,
 } from "../components/ui-lib";
-import { useNavigate } from "react-router-dom";
 import {
   CHAT_PAGE_SIZE,
   LAST_INPUT_KEY,

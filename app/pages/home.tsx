@@ -99,16 +99,6 @@ function useHtmlLang() {
   }, []);
 }
 
-const useHasHydrated = () => {
-  const [hasHydrated, setHasHydrated] = useState<boolean>(false);
-
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
-
-  return hasHydrated;
-};
-
 function Screen() {
   const config = useAppConfig();
   const isMobileScreen = useMobileScreen();
@@ -131,7 +121,7 @@ function Screen() {
 
       <div className={styles["window-content"]} id={SlotID.AppBody}>
         <Routes>
-          <Route path={Path.Home} element={<Chat />} />
+          <Route path={Path.Home} element={!isMobileScreen ? <Chat /> : null} />
           <Route path={Path.NewChat} element={<NewChat />} />
           <Route path={Path.Masks} element={<MaskPage />} />
           <Route path={Path.Chat} element={<Chat />} />
@@ -148,12 +138,14 @@ export function Home() {
   useSwitchTheme();
   useHtmlLang();
 
+  const [hasHydrated, setHasHydrated] = useState<boolean>(false);
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
     useAccessStore.getState().fetch();
+    setHasHydrated(true);
   }, []);
 
-  if (!useHasHydrated()) {
+  if (!hasHydrated) {
     return <Loading />;
   }
 
