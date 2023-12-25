@@ -1,6 +1,6 @@
 import { useEffect, useRef, useMemo } from "react";
 
-import styles from "./home.module.scss";
+import styles from "./sidebar.module.scss";
 
 import { IconButton } from "../components/button";
 import SettingsIcon from "../icons/settings.svg";
@@ -12,6 +12,7 @@ import DragIcon from "../icons/drag.svg";
 import UserIcon from "../icons/user.svg";
 
 import Locale from "../locales";
+import { useLocation } from "react-router-dom";
 
 import { useAppConfig, useChatStore } from "../store";
 
@@ -140,6 +141,9 @@ export function SideBar(props: { className?: string }) {
     () => getDeviceInfo().isIos && isMobileScreen,
     [isMobileScreen],
   );
+  const location = useLocation();
+
+  const isHome = location.pathname === Path.Home;
 
   useHotKey();
 
@@ -147,7 +151,7 @@ export function SideBar(props: { className?: string }) {
     <div
       className={`${styles.sidebar} ${props.className} ${
         shouldNarrow && styles["narrow-sidebar"]
-      }`}
+      } ${isHome && styles["sidebar-show"]}`}
       style={{
         // #3016 disable transition on ios mobile screen
         transition: isMobileScreen && isIOSMobile ? "none" : undefined,

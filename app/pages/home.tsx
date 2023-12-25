@@ -17,12 +17,7 @@ import { ErrorBoundary } from "../components/error";
 
 import { getISOLang } from "../locales";
 
-import {
-  HashRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { getClientConfig } from "../config/client";
@@ -116,8 +111,6 @@ const useHasHydrated = () => {
 
 function Screen() {
   const config = useAppConfig();
-  const location = useLocation();
-  const isHome = location.pathname === Path.Home;
   const isMobileScreen = useMobileScreen();
   const shouldTightBorder = config.tightBorder && !isMobileScreen;
 
@@ -134,7 +127,7 @@ function Screen() {
         ` ${shouldTightBorder ? styles["tight-container"] : styles.container} `
       }
     >
-      <SideBar className={isHome ? styles["sidebar-show"] : ""} />
+      <SideBar />
 
       <div className={styles["window-content"]} id={SlotID.AppBody}>
         <Routes>
