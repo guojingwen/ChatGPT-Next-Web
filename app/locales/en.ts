@@ -276,7 +276,7 @@ const en: LocaleType = {
     },
     Config: {
       Avatar: "AI Avatar",
-      Name: "Session Title",
+      Name: "Mask Title",
       Sync: {
         Title: "Use Global Config",
         SubTitle: "Use global config in this chat",

@@ -68,6 +68,7 @@ export function MaskAvatar(props: { avatar: string; model?: ModelType }) {
 
 export function MaskConfig(props: {
   mask: Mask;
+  hideMaskTitle?: boolean;
   updateMask: Updater<Mask>;
   extraListItems?: JSX.Element;
   readonly?: boolean;
@@ -125,17 +126,20 @@ export function MaskConfig(props: {
             </div>
           </Popover>
         </ListItem>
-        <ListItem title={Locale.Mask.Config.Name}>
-          <input
-            type="text"
-            value={props.mask.name}
-            onInput={(e) =>
-              props.updateMask((mask) => {
-                mask.name = e.currentTarget.value;
-              })
-            }
-          ></input>
-        </ListItem>
+        {!props.hideMaskTitle && (
+          <ListItem title={Locale.Mask.Config.Name}>
+            <input
+              type="text"
+              value={props.mask.name}
+              onInput={(e) =>
+                props.updateMask((mask) => {
+                  mask.name = e.currentTarget.value;
+                })
+              }
+            ></input>
+          </ListItem>
+        )}
+
         <ListItem
           title={Locale.Mask.Config.HideContext.Title}
           subTitle={Locale.Mask.Config.HideContext.SubTitle}

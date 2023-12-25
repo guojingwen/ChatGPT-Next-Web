@@ -270,7 +270,7 @@ const cn = {
     },
     Config: {
       Avatar: "AI头像",
-      Name: "会话标题",
+      Name: "面具标题",
       Sync: {
         Title: "使用全局设置",
         SubTitle: "当前对话是否使用全局模型设置",

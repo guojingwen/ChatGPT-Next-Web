@@ -1032,6 +1032,7 @@ export function SessionConfigModel(props: { onClose: () => void }) {
       >
         <MaskConfig
           mask={session.mask}
+          hideMaskTitle={true}
           updateMask={(updater) => {
             const mask = { ...session.mask };
             updater(mask);
