@@ -2,7 +2,7 @@ import { useEffect, useRef, useMemo } from "react";
 
 import styles from "./home.module.scss";
 
-import { IconButton } from "./button";
+import { IconButton } from "../components/button";
 import SettingsIcon from "../icons/settings.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
@@ -26,11 +26,14 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useMobileScreen, getDeviceInfo } from "../utils";
 import dynamic from "next/dynamic";
-import { showToast } from "./ui-lib";
+import { showToast } from "../components/ui-lib";
 
-const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
-  loading: () => null,
-});
+const ChatList = dynamic(
+  async () => (await import("../components/chat-list")).ChatList,
+  {
+    loading: () => null,
+  },
+);
 
 function useHotKey() {
   const chatStore = useChatStore();

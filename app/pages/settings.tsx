@@ -11,17 +11,18 @@ import EyeIcon from "../icons/eye.svg";
 import DownloadIcon from "../icons/download.svg";
 import UploadIcon from "../icons/upload.svg";
 
-import { Input, List, ListItem, Modal, Select, showConfirm } from "./ui-lib";
-import { ModelConfigList } from "./model-config";
-
-import { IconButton } from "./button";
 import {
-  SubmitKey,
-  useChatStore,
-  Theme,
-  useAccessStore,
-  useAppConfig,
-} from "../store";
+  Input,
+  List,
+  ListItem,
+  Modal,
+  Select,
+  showConfirm,
+} from "../components/ui-lib";
+import { ModelConfigList } from "../components/model-config";
+
+import { IconButton } from "../components/button";
+import { SubmitKey, useChatStore, Theme, useAppConfig } from "../store";
 
 import Locale, {
   AllLangs,
@@ -32,8 +33,8 @@ import Locale, {
 import { copyToClipboard, useMobileScreen } from "../utils";
 import { Path } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
-import { ErrorBoundary } from "./error";
-import { InputRange } from "./input-range";
+import { ErrorBoundary } from "../components/error";
+import { InputRange } from "../components/input-range";
 import { useNavigate } from "react-router-dom";
 import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";

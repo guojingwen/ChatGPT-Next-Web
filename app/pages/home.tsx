@@ -13,7 +13,7 @@ import { getDeviceInfo, getCSSVar, useMobileScreen } from "../utils";
 
 import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
-import { ErrorBoundary } from "./error";
+import { ErrorBoundary } from "../components/error";
 
 import { getISOLang } from "../locales";
 

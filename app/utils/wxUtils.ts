@@ -10,7 +10,7 @@ export const wxPromise = new Promise((_resolve) => {
 export const initWx = () => {
   fetchWxJsSdk().then((res) => {
     const _config = {
-      debug: true,
+      debug: false,
       appId: res.appId,
       timestamp: res.timestamp,
       nonceStr: res.nonceStr,

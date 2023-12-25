@@ -45,10 +45,16 @@ import { useMaskStore } from "../store/mask";
 
 import Locale from "../locales";
 
-import { IconButton } from "./button";
+import { IconButton } from "../components/button";
 import styles from "./chat.module.scss";
 
-import { Selector, showConfirm, showToast, ListItem, Modal } from "./ui-lib";
+import {
+  Selector,
+  showConfirm,
+  showToast,
+  ListItem,
+  Modal,
+} from "../components/ui-lib";
 import { useNavigate } from "react-router-dom";
 import {
   CHAT_PAGE_SIZE,
@@ -57,17 +63,21 @@ import {
   REQUEST_TIMEOUT_MS,
   UNFINISHED_INPUT,
 } from "../constant";
-import { Avatar } from "./emoji";
-import { MaskAvatar, MaskConfig } from "./mask";
+import { Avatar } from "../components/emoji";
+import { MaskConfig } from "./mask";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { useAllModels } from "../utils/hooks";
-import Header from "./header";
-import PromptHints, { type RenderPompt } from "./prompt-hints";
+import Header from "../components/header";
+import PromptHints, { type RenderPompt } from "../components/prompt-hints";
+import MaskAvatar from "../components/mask-avatar";
 
-const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
-  loading: () => <LoadingIcon />,
-});
+const Markdown = dynamic(
+  async () => (await import("../components/markdown")).Markdown,
+  {
+    loading: () => <LoadingIcon />,
+  },
+);
 
 function useSubmitHandler() {
   const config = useAppConfig();
@@ -354,7 +364,7 @@ export function ChatActions(props: {
             value: m.name,
           }))}
           onClose={() => setShowModelSelector(false)}
-          onSelection={(s) => {
+          onSelection={(s: any[]) => {
             if (s.length === 0) return;
             chatStore.updateCurrentSession((session) => {
               session.mask.modelConfig.model = s[0] as ModelType;

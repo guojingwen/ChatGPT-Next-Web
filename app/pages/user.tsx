@@ -1,7 +1,7 @@
 import styles from "./user.module.scss";
 import { useMobileScreen } from "../utils";
 import Locale from "../locales";
-import { IconButton } from "./button";
+import { IconButton } from "../components/button";
 import ReturnIcon from "../icons/return.svg";
 import { useNavigate } from "react-router-dom";
 import VIP from "../icons/vip.svg";

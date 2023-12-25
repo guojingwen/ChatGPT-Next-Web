@@ -1,5 +1,5 @@
-import { IconButton } from "./button";
-import { ErrorBoundary } from "./error";
+import { IconButton } from "../components/button";
+import { ErrorBoundary } from "../components/error";
 
 import styles from "./mask.module.scss";
 
@@ -31,8 +31,8 @@ import {
   Popover,
   Select,
   showConfirm,
-} from "./ui-lib";
-import { Avatar, AvatarPicker } from "./emoji";
+} from "../components/ui-lib";
+import { Avatar, AvatarPicker } from "../components/emoji";
 import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
 import { useNavigate } from "react-router-dom";
 
@@ -40,7 +40,7 @@ import chatStyle from "./chat.module.scss";
 import { useMemo, useState } from "react";
 import { downloadAs, readFromFile } from "../utils";
 import { Updater } from "../typing";
-import { ModelConfigList } from "./model-config";
+import { ModelConfigList } from "../components/model-config";
 import { FileName, Path } from "../constant";
 import { BUILTIN_MASK_STORE } from "../masks";
 import {
@@ -49,6 +49,7 @@ import {
   Draggable,
   OnDragEndResponder,
 } from "@hello-pangea/dnd";
+import MaskAvatar from "../components/mask-avatar";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -56,14 +57,6 @@ function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
   return result;
-}
-
-export function MaskAvatar(props: { avatar: string; model?: ModelType }) {
-  return props.avatar !== DEFAULT_MASK_AVATAR ? (
-    <Avatar avatar={props.avatar} />
-  ) : (
-    <Avatar model={props.model} />
-  );
 }
 
 export function MaskConfig(props: {
