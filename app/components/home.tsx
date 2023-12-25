@@ -9,7 +9,7 @@ import styles from "./home.module.scss";
 import BotIcon from "../icons/bot.svg";
 import LoadingIcon from "../icons/three-dots.svg";
 
-import { getCSSVar, useMobileScreen } from "../utils";
+import { getDeviceInfo, getCSSVar, useMobileScreen } from "../utils";
 
 import dynamic from "next/dynamic";
 import { Path, SlotID } from "../constant";
@@ -26,7 +26,6 @@ import {
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { getClientConfig } from "../config/client";
-import { api } from "../client/api";
 import { useAccessStore } from "../store";
 import { initWx } from "../utils/wxUtils";
 
@@ -123,7 +122,9 @@ function Screen() {
   const shouldTightBorder = config.tightBorder && !isMobileScreen;
 
   useEffect(() => {
-    initWx();
+    if (getDeviceInfo().isWeixin) {
+      initWx();
+    }
   }, []);
 
   return (

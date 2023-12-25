@@ -19,14 +19,13 @@ export enum Theme {
   Light = "light",
 }
 
-const devices = getDeviceInfo();
 export const DEFAULT_CONFIG = {
   lastUpdate: Date.now(), // timestamp, to merge state
 
   submitKey:
-    devices.isWeixin || devices.isMobile
+    getDeviceInfo().isWeixin || getDeviceInfo().isMobile
       ? SubmitKey.Enter
-      : devices.isMacOS
+      : getDeviceInfo().isMacOS
       ? SubmitKey.MetaEnter
       : SubmitKey.CtrlEnter,
   avatar: "1f603",

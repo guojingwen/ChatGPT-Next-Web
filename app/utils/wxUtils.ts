@@ -1,3 +1,5 @@
+"use client";
+
 import { fetchWxJsSdk } from "../client/api";
 
 export let wxResolve: (value: unknown) => void;
@@ -8,7 +10,7 @@ export const wxPromise = new Promise((_resolve) => {
 export const initWx = () => {
   fetchWxJsSdk().then((res) => {
     const _config = {
-      debug: false,
+      debug: true,
       appId: res.appId,
       timestamp: res.timestamp,
       nonceStr: res.nonceStr,

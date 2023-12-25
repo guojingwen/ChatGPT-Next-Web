@@ -71,4 +71,6 @@ nextConfig.rewrites = async () => {
   };
 };
 
+nextConfig.reactStrictMode = false;
+
 export default nextConfig;

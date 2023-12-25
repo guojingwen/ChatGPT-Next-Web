@@ -174,9 +174,10 @@ export function getCSSVar(varName: string) {
  */
 export function getDeviceInfo(): DeviceInfo {
   if (typeof window !== "undefined") {
+    if (window.devices) return window.devices;
     const ua = navigator.userAgent;
     const uaL = ua.toLocaleLowerCase();
-    return {
+    window.devices = {
       isAndroid: /Android/.test(ua),
       isIos: /iphone|ipad|ipod/.test(uaL),
       isMobile: /Android|iPhone/i.test(ua),
@@ -184,14 +185,7 @@ export function getDeviceInfo(): DeviceInfo {
       isMacOS: /iphone|ipad|ipod|macintosh/.test(uaL),
       isWeixin: /MicroMessenger/i.test(ua),
     };
+    return window.devices;
   }
   return {} as DeviceInfo;
 }
-type DeviceInfo = {
-  isAndroid: boolean;
-  isIos: boolean;
-  isMobile: boolean;
-  isSafari: boolean;
-  isMacOS: boolean;
-  isWeixin: boolean;
-};

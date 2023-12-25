@@ -26,7 +26,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useMobileScreen, getDeviceInfo } from "../utils";
 import dynamic from "next/dynamic";
-import { showConfirm, showToast } from "./ui-lib";
+import { showToast } from "./ui-lib";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -230,7 +230,4 @@ export function SideBar(props: { className?: string }) {
       )}
     </div>
   );
-}
-function getDevices() {
-  throw new Error("Function not implemented.");
 }
