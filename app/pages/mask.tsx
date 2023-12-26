@@ -13,12 +13,11 @@ import EyeIcon from "../icons/eye.svg";
 import CopyIcon from "../icons/copy.svg";
 import DragIcon from "../icons/drag.svg";
 
-import { DEFAULT_MASK_AVATAR, Mask, useMaskStore } from "../store/mask";
+import { Mask, useMaskStore } from "../store/mask";
 import {
   ChatMessage,
   createMessage,
   ModelConfig,
-  ModelType,
   useAppConfig,
   useChatStore,
 } from "../store";
@@ -32,10 +31,9 @@ import {
   Select,
   showConfirm,
 } from "../components/ui-lib";
-import { Avatar, AvatarPicker } from "../components/emoji";
+import { AvatarPicker } from "../components/emoji";
 import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
 
-import chatStyle from "./chat.module.scss";
 import { useMemo, useState } from "react";
 import { downloadAs, readFromFile, useNavigate } from "../utils";
 import { Updater } from "../typing";
@@ -196,15 +194,15 @@ function ContextPromptItem(props: {
   const [focusingInput, setFocusingInput] = useState(false);
 
   return (
-    <div className={chatStyle["context-prompt-row"]}>
+    <div className={styles["context-prompt-row"]}>
       {!focusingInput && (
         <>
-          <div className={chatStyle["context-drag"]}>
+          <div className={styles["context-drag"]}>
             <DragIcon />
           </div>
           <Select
             value={props.prompt.role}
-            className={chatStyle["context-role"]}
+            className={styles["context-role"]}
             onChange={(e) =>
               props.update({
                 ...props.prompt,
@@ -223,7 +221,7 @@ function ContextPromptItem(props: {
       <Input
         value={props.prompt.content}
         type="text"
-        className={chatStyle["context-content"]}
+        className={styles["context-content"]}
         rows={focusingInput ? 5 : 1}
         onFocus={() => setFocusingInput(true)}
         onBlur={() => {
@@ -242,7 +240,7 @@ function ContextPromptItem(props: {
       {!focusingInput && (
         <IconButton
           icon={<DeleteIcon />}
-          className={chatStyle["context-delete-button"]}
+          className={styles["context-delete-button"]}
           onClick={() => props.remove()}
           bordered
         />
@@ -285,7 +283,7 @@ export function ContextPrompts(props: {
 
   return (
     <>
-      <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
+      <div className={styles["context-prompt"]} style={{ marginBottom: 20 }}>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="context-prompt-list">
             {(provided) => (
@@ -309,7 +307,7 @@ export function ContextPrompts(props: {
                           remove={() => removeContextPrompt(i)}
                         />
                         <div
-                          className={chatStyle["context-prompt-insert"]}
+                          className={styles["context-prompt-insert"]}
                           onClick={() => {
                             addContextPrompt(
                               createMessage({
@@ -334,12 +332,12 @@ export function ContextPrompts(props: {
         </DragDropContext>
 
         {props.context.length === 0 && (
-          <div className={chatStyle["context-prompt-row"]}>
+          <div className={styles["context-prompt-row"]}>
             <IconButton
               icon={<AddIcon />}
               text={Locale.Context.Add}
               bordered
-              className={chatStyle["context-prompt-button"]}
+              className={styles["context-prompt-button"]}
               onClick={() =>
                 addContextPrompt(
                   createMessage({

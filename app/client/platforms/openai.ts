@@ -1,10 +1,5 @@
-import {
-  ApiPath,
-  DEFAULT_MODELS,
-  OpenaiPath,
-  REQUEST_TIMEOUT_MS,
-} from "@/app/constant";
-import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
+import { ApiPath, OpenaiPath, REQUEST_TIMEOUT_MS } from "@/app/constant";
+import { useAppConfig, useChatStore } from "@/app/store";
 
 import { ChatOptions, getHeaders, LLMApi, LLMUsage } from "../api";
 import {
@@ -267,3 +262,36 @@ export class ChatGPTApi implements LLMApi {
   }
 }
 export { OpenaiPath };
+
+export type VoiceModel = "tts-1" | "tts-1-hd";
+export type VoiceType =
+  | "alloy"
+  | "echo"
+  | "fable"
+  | "onyx"
+  | "nova"
+  | "shimmer";
+export interface SpeechTextParams {
+  model: VoiceModel;
+  voice: VoiceType;
+  input: string;
+}
+
+export async function fetchSpeechText(input: string) {
+  const params: SpeechTextParams = {
+    model: "tts-1",
+    voice: "alloy",
+    input,
+  };
+  const res = await fetch("/api/openai/speechToText", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  }).then((res) => res.json());
+  return res as ResSpeechText;
+}
+export interface ResSpeechText {
+  audioBase64: string;
+}

@@ -69,3 +69,11 @@ export async function requestOpenai(req: NextRequest) {
     clearTimeout(timeoutId);
   }
 }
+
+async function streamToString(stream: ReadableStream<Uint8Array>) {
+  const chunks = [];
+  for await (let chunk of stream) {
+    chunks.push(Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks).toString("utf-8");
+}

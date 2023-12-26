@@ -8,7 +8,7 @@ const logger = console;
 
 const dbConnection = {
   host: DB_HOST,
-  port: +DB_PORT,
+  port: +DB_PORT!,
   user: "root",
   password: DB_PASSWORD,
   database: DB_NAME,

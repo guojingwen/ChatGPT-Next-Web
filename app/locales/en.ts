@@ -17,6 +17,7 @@ const en: LocaleType = {
       Copy: "Copy",
       Stop: "Stop",
       Retry: "Retry",
+      Voice: "Play",
       PinToastAction: "View",
       Delete: "Delete",
       Edit: "Edit",

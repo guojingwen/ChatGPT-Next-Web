@@ -18,6 +18,9 @@ import RobotIcon from "../icons/robot.svg";
 import IconKeyboard from "../icons/keyboard.svg";
 import IconVoice from "../icons/voice.svg";
 import IconSelect from "../icons/select.svg";
+import AudioIcon from "../icons/audio.svg";
+
+import { fetchSpeechText } from "../client/platforms/openai";
 
 import {
   ChatMessage,
@@ -36,26 +39,20 @@ import {
   autoGrowTextArea,
   useMobileScreen,
   useNavigate,
+  audioInst,
 } from "../utils";
 
 import dynamic from "next/dynamic";
 
 import { ChatControllerPool } from "../client/controller";
 import { usePromptStore } from "../store/prompt";
-import { useMaskStore } from "../store/mask";
 
 import Locale from "../locales";
 
 import { IconButton } from "../components/button";
 import styles from "./chat.module.scss";
 
-import {
-  Selector,
-  showConfirm,
-  showToast,
-  ListItem,
-  Modal,
-} from "../components/ui-lib";
+import { Selector, Toast, showToast } from "../components/ui-lib";
 import {
   CHAT_PAGE_SIZE,
   LAST_INPUT_KEY,
@@ -64,13 +61,13 @@ import {
   UNFINISHED_INPUT,
 } from "../constant";
 import { Avatar } from "../components/emoji";
-import { MaskConfig } from "./mask";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
 import { prettyObject } from "../utils/format";
 import { useAllModels } from "../utils/hooks";
 import Header from "../components/header";
 import PromptHints, { type RenderPompt } from "../components/prompt-hints";
 import MaskAvatar from "../components/mask-avatar";
+import SessionConfigModel from "../components/session-config-model";
 
 const Markdown = dynamic(
   async () => (await import("../components/markdown")).Markdown,
@@ -271,6 +268,32 @@ export function ChatActions(props: {
       showToast(nextModel);
     }
   }, [chatStore, currentModel, models]);
+  const [isGranted, setIsGranted] = useState<boolean>(
+    window.isVoiceGrantPrivilege,
+  );
+  const [isRecording, setIsRecording] = useState(false);
+  const switchInputType = async () => {
+    // 切到声音，未开启音频
+    const isInput = props.inputType === "Keyboard";
+    if (isInput && !isGranted) {
+      await new Promise((resolve) => {
+        window.wx.startRecord({
+          success() {
+            if (!window.isVoiceGrantPrivilege) {
+              window.isVoiceGrantPrivilege = true;
+              setIsGranted(true);
+              // Toast.show('已开启音频权限');
+              setTimeout(() => {
+                window.wx.stopRecord();
+              }, 50);
+              resolve(null);
+            }
+          },
+        });
+      });
+    }
+    props.switchInputType(isInput ? "Voice" : "Keyboard");
+  };
 
   return (
     <div className={styles["chat-input-actions"]}>
@@ -340,11 +363,7 @@ export function ChatActions(props: {
       />
       {isMobileScreen && (
         <ChatAction
-          onClick={() =>
-            props.switchInputType(
-              props.inputType === "Keyboard" ? "Voice" : "Keyboard",
-            )
-          }
+          onClick={switchInputType}
           text={
             Locale.Chat.InputActions[
               props.inputType === "Keyboard" ? "Voice" : "Keyboard"
@@ -749,6 +768,62 @@ function _Chat() {
   }, []);
 
   const [inputType, switchInputType] = useState<InputType>("Keyboard");
+
+  /* 语音功能相关 */
+  const [isRecording, setIsRecording] = useState(false);
+  const start = async () => {
+    /* if (!userState.isLogin) {
+      events.emit('needLogin');
+      return;
+    } */
+    setIsRecording(true);
+    window.wx.startRecord();
+  };
+  let localId: string | null = null;
+  useEffect(() => {
+    window.wx.onVoiceRecordEnd({
+      // 录音时间超过一分钟没有停止的时候会执行 complete 回调
+      complete: function (res: { localId: string }) {
+        showToast("微信限制，录音时间超过一分钟自动停止");
+        localId = res.localId;
+        setIsRecording(false);
+        toConvert(localId);
+      },
+    });
+  }, []);
+  const end = () => {
+    window.wx.stopRecord({
+      success: function (res: { localId: string }) {
+        localId = res.localId;
+        setIsRecording(false);
+        toConvert(localId);
+      },
+      error(err: any) {
+        setIsRecording(false);
+      },
+    });
+  };
+  async function toConvert(localId: string) {
+    // showToast(localId);
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
+    window.wx.translateVoice({
+      localId, // 需要识别的音频的本地Id，由录音相关接口获得
+      isShowProgressTips: 0, // 默认为1，显示进度提示
+      success: function (res: { translateResult: string }) {
+        const text = res.translateResult;
+        // showToast(text);
+        doSubmit(text);
+      },
+      error(err: any) {
+        // showToast("translateVoice失败");
+      },
+    });
+  }
+  const toSpeak = async (item: RenderMessage) => {
+    console.log("---toSpeak", item);
+    const { audioBase64 } = await fetchSpeechText(item.content);
+    audioInst.play(audioBase64);
+  };
   return (
     <div className={styles.chat} key={session.id}>
       <Header />
@@ -831,6 +906,13 @@ function _Chat() {
                                 icon={<CopyIcon />}
                                 onClick={() => copyToClipboard(message.content)}
                               />
+                              {!isUser ? (
+                                <ChatAction
+                                  text={Locale.Chat.Actions.Voice}
+                                  icon={<AudioIcon />}
+                                  onClick={() => toSpeak(message)}
+                                />
+                              ) : null}
                             </>
                           )}
                         </div>
@@ -918,77 +1000,33 @@ function _Chat() {
             />
           </div>
         ) : (
-          <div className={styles.chat_voice}>
+          <div
+            className={styles.chat_voice}
+            onTouchStart={start}
+            onTouchEnd={end}
+            style={{
+              borderColor: isRecording ? `red` : `var(--primary)`,
+            }}
+          >
+            <span
+              className={styles.voice_on_tip}
+              style={{
+                display: isRecording ? "inline-block" : "none",
+              }}
+            >
+              松开发送
+            </span>
             <IconSelect className={styles.chat_voice_icon} />
             {Locale.Chat.VoiceTip}
-            <IconVoice className={styles.chat_voice_voice} />
+            <IconVoice
+              className={styles.chat_voice_voice}
+              style={{
+                fill: isRecording ? `red` : `var(--primary)`,
+              }}
+            />
           </div>
         )}
       </div>
-    </div>
-  );
-}
-export function SessionConfigModel(props: { onClose: () => void }) {
-  const chatStore = useChatStore();
-  const session = chatStore.currentSession();
-  const maskStore = useMaskStore();
-  const navigate = useNavigate();
-
-  return (
-    <div className="modal-mask">
-      <Modal
-        title={Locale.Context.Edit}
-        onClose={() => props.onClose()}
-        actions={[
-          <IconButton
-            key="reset"
-            icon={<ResetIcon />}
-            bordered
-            text={Locale.Chat.Config.Reset}
-            onClick={async () => {
-              if (await showConfirm(Locale.Memory.ResetConfirm)) {
-                chatStore.updateCurrentSession(
-                  (session) => (session.memoryPrompt = ""),
-                );
-              }
-            }}
-          />,
-          <IconButton
-            key="copy"
-            icon={<CopyIcon />}
-            bordered
-            text={Locale.Chat.Config.SaveAs}
-            onClick={() => {
-              navigate(Path.Masks);
-              setTimeout(() => {
-                maskStore.create(session.mask);
-              }, 500);
-            }}
-          />,
-        ]}
-      >
-        <MaskConfig
-          mask={session.mask}
-          hideMaskTitle={true}
-          updateMask={(updater) => {
-            const mask = { ...session.mask };
-            updater(mask);
-            chatStore.updateCurrentSession((session) => (session.mask = mask));
-          }}
-          shouldSyncFromGlobal
-          extraListItems={
-            session.mask.modelConfig.sendMemory ? (
-              <ListItem
-                className="copyable"
-                title={`${Locale.Memory.Title} (${session.lastSummarizeIndex} of ${session.messages.length})`}
-                subTitle={session.memoryPrompt || Locale.Memory.EmptyContent}
-              ></ListItem>
-            ) : (
-              <></>
-            )
-          }
-        ></MaskConfig>
-      </Modal>
     </div>
   );
 }

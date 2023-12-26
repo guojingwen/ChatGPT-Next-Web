@@ -15,6 +15,7 @@ const cn = {
       Copy: "复制",
       Stop: "停止",
       Retry: "重试",
+      Voice: "播放",
       PinToastAction: "查看",
       Delete: "删除",
       Edit: "编辑",

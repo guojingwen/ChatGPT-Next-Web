@@ -1,3 +1,5 @@
+import Ffmpeg from "fluent-ffmpeg";
+
 declare module "*.jpg";
 declare module "*.png";
 declare module "*.woff2";
@@ -10,10 +12,15 @@ declare module "*.scss" {
 
 declare module "*.svg";
 
+declare module "fluent-ffmpeg/lib/fluent-ffmpeg" {
+  export default Ffmpeg;
+}
+
 declare interface Window {
   wx: Wx;
   wxPromise: Promise<Wx>;
   devices: DeviceInfo;
+  isVoiceGrantPrivilege: boolean;
 }
 
 declare interface Wx {

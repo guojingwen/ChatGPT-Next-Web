@@ -46,4 +46,4 @@ export interface WxSign {
 }
 
 export const GET = handle;
-export const POST = handle;
+// export const POST = handle;

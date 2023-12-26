@@ -97,63 +97,6 @@
   }
 }
 
-.context-prompt {
-  .context-prompt-insert {
-    display: flex;
-    justify-content: center;
-    padding: 4px;
-    opacity: 0.2;
-    transition: all ease 0.3s;
-    background-color: rgba(0, 0, 0, 0);
-    cursor: pointer;
-    border-radius: 4px;
-    margin-top: 4px;
-    margin-bottom: 4px;
-
-    &:hover {
-      opacity: 1;
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-  }
-
-  .context-prompt-row {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-
-    &:hover {
-      .context-drag {
-        opacity: 1;
-      }
-    }
-
-    .context-drag {
-      display: flex;
-      align-items: center;
-      opacity: 0.5;
-      transition: all ease 0.3s;
-    }
-
-    .context-role {
-      margin-right: 10px;
-    }
-
-    .context-content {
-      flex: 1;
-      max-width: 100%;
-      text-align: left;
-    }
-
-    .context-delete-button {
-      margin-left: 10px;
-    }
-  }
-
-  .context-prompt-button {
-    flex: 1;
-  }
-}
-
 .memory-prompt {
   margin: 20px 0;
 
@@ -445,7 +388,7 @@
   &:hover,
   &:active {
     background-color: var(--hover-color);
-    border: var(--primary);
+    border: 1px solid var(--primary);
   }
 }
 .chat_voice_icon {
@@ -459,6 +402,20 @@
   position: absolute;
   right: 20px;
   fill: var(--primary);
+}
+.voice_on_tip {
+  position: absolute;
+  font-size: 14px;
+  top: -40px;
+  left: 50%;
+  transform: translateX(calc(-50% + 10px));
+  letter-spacing: 2ch;
+  color: red;
+  user-select: none;
+  display: none;
+  padding: 8px 14px;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 @media only screen and (max-width: 600px) {
