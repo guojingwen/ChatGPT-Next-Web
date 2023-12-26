@@ -1,4 +1,4 @@
-import DeleteIcon from "../icons/delete1.svg";
+import DeleteIcon from "../icons/delete.svg";
 
 import styles from "./chat-list.module.scss";
 import {
@@ -8,11 +8,11 @@ import {
   OnDragEndResponder,
 } from "@hello-pangea/dnd";
 
-import { ModelType, useChatStore } from "../store";
+import { useChatStore } from "../store";
 
 import Locale from "../locales";
 import { Path } from "../constant";
-import { DEFAULT_MASK_AVATAR, Mask } from "../store/mask";
+import { Mask } from "../store/mask";
 import { useRef, useEffect } from "react";
 import { showConfirm } from "./ui-lib";
 import { useMobileScreen, useNavigate } from "../utils";

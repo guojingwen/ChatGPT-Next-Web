@@ -21,7 +21,6 @@ import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { getClientConfig } from "../config/client";
-import { useAccessStore } from "../store";
 import { initWx } from "../utils/wxUtils";
 
 export function Loading(props: { noLogo?: boolean }) {
@@ -141,7 +140,6 @@ export function Home() {
   const [hasHydrated, setHasHydrated] = useState<boolean>(false);
   useEffect(() => {
     console.log("[Config] got config from build time", getClientConfig());
-    useAccessStore.getState().fetch();
     setHasHydrated(true);
   }, []);
 

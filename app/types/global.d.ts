@@ -27,21 +27,6 @@ declare interface Wx {
   [key: string]: any;
 }
 
-declare module NodeJS {
-  export interface ProcessEnv {
-    NODE_ENV: "development" | "testing" | "production";
-    DB_HOST: string;
-    DB_PORT: string;
-    DB_PASSWORD: string;
-    DB_NAME: string;
-    PORT: string;
-    APPID: string;
-    APPSECRET: string;
-    WEIXIN_TOKEN: string;
-    SESSION_KEY: string;
-    API_KEY: string;
-  }
-}
 interface JsTicket {
   ticket: string;
   access_token: string;

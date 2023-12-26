@@ -1,32 +1,15 @@
 import { NextRequest } from "next/server";
-import { getServerSideConfig } from "../config/server";
 import { OPENAI_BASE_URL } from "../constant";
-
-const serverConfig = getServerSideConfig();
 
 export async function requestOpenai(req: NextRequest) {
   const controller = new AbortController();
 
-  const authValue = req.headers.get("Authorization") ?? "";
-  const authHeaderName = "Authorization";
-
-  let path = `${req.nextUrl.pathname}${req.nextUrl.search}`.replaceAll(
+  const path = `${req.nextUrl.pathname}${req.nextUrl.search}`.replaceAll(
     "/api/openai/",
     "",
   );
 
-  let baseUrl = serverConfig.baseUrl || OPENAI_BASE_URL;
-
-  if (!baseUrl.startsWith("http")) {
-    baseUrl = `https://${baseUrl}`;
-  }
-
-  if (baseUrl.endsWith("/")) {
-    baseUrl = baseUrl.slice(0, -1);
-  }
-
   console.log("[Proxy] ", path);
-  console.log("[Base Url]", baseUrl);
 
   const timeoutId = setTimeout(
     () => {
@@ -35,12 +18,12 @@ export async function requestOpenai(req: NextRequest) {
     10 * 60 * 1000,
   );
 
-  const fetchUrl = `${baseUrl}/${path}`;
+  const fetchUrl = `${OPENAI_BASE_URL}/${path}`;
   const fetchOptions: RequestInit = {
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
-      [authHeaderName]: authValue,
+      Authorization: `Bearer ${process.env.API_KEY}`,
     },
     method: req.method,
     body: req.body,
@@ -68,12 +51,4 @@ export async function requestOpenai(req: NextRequest) {
   } finally {
     clearTimeout(timeoutId);
   }
-}
-
-async function streamToString(stream: ReadableStream<Uint8Array>) {
-  const chunks = [];
-  for await (let chunk of stream) {
-    chunks.push(Buffer.from(chunk));
-  }
-  return Buffer.concat(chunks).toString("utf-8");
 }

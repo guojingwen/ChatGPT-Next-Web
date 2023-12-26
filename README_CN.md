@@ -44,54 +44,6 @@
 
 > 本项目大多数配置项都通过环境变量来设置，教程：[如何修改 Vercel 环境变量](./docs/vercel-cn.md)。
 
-### `OPENAI_API_KEY` （必填项）
-
-OpanAI 密钥，你在 openai 账户页面申请的 api key，使用英文逗号隔开多个 key，这样可以随机轮询这些 key。
-
-### `BASE_URL` （可选）
-
-> Default: `https://api.openai.com`
-
-> Examples: `http://your-openai-proxy.com`
-
-OpenAI 接口代理 URL，如果你手动配置了 openai 接口代理，请填写此选项。
-
-> 如果遇到 ssl 证书问题，请将 `BASE_URL` 的协议设置为 http。
-
-### `DISABLE_GPT4` （可选）
-
-如果你不想让用户使用 GPT-4，将此环境变量设置为 1 即可。
-
-### `ENABLE_BALANCE_QUERY` （可选）
-
-如果你想启用余额查询功能，将此环境变量设置为 1 即可。
-
-### `DISABLE_FAST_LINK` （可选）
-
-如果你想禁用从链接解析预制设置，将此环境变量设置为 1 即可。
-
-### `CUSTOM_MODELS` （可选）
-
-> 示例：`+qwen-7b-chat,+glm-6b,-gpt-3.5-turbo,gpt-4-1106-preview=gpt-4-turbo` 表示增加 `qwen-7b-chat` 和 `glm-6b` 到模型列表，而从列表中删除 `gpt-3.5-turbo`，并将 `gpt-4-1106-preview` 模型名字展示为 `gpt-4-turbo`。
-> 如果你想先禁用所有模型，再启用指定模型，可以使用 `-all,+gpt-3.5-turbo`，则表示仅启用 `gpt-3.5-turbo`
-
-用来控制模型列表，使用 `+` 增加一个模型，使用 `-` 来隐藏一个模型，使用 `模型名=展示名` 来自定义模型的展示名，用英文逗号隔开。
-
-## 开发
-
-点击下方按钮，开始二次开发：
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/Yidadaa/ChatGPT-Next-Web)
-
-在开始写代码之前，需要在项目根目录新建一个 `.env.local` 文件，里面填入环境变量：
-
-```
-OPENAI_API_KEY=<your api key here>
-
-# 中国大陆用户，可以使用本项目自带的代理进行开发，你也可以自由选择其他代理地址
-BASE_URL=https://b.nextweb.fun/api/proxy
-```
-
 ### 本地开发
 
 1. 安装 nodejs 18 和 yarn，具体细节请询问 ChatGPT；
@@ -110,7 +62,6 @@ BASE_URL=https://b.nextweb.fun/api/proxy
 docker pull yidadaa/chatgpt-next-web
 
 docker run -d -p 3000:3000 \
-   -e OPENAI_API_KEY=sk-xxxx \
    yidadaa/chatgpt-next-web
 ```
 
@@ -118,16 +69,8 @@ docker run -d -p 3000:3000 \
 
 ```shell
 docker run -d -p 3000:3000 \
-   -e OPENAI_API_KEY=sk-xxxx \
    --net=host \
-   -e PROXY_URL=http://127.0.0.1:7890 \
    yidadaa/chatgpt-next-web
-```
-
-如果你的本地代理需要账号密码，可以使用：
-
-```shell
--e PROXY_URL="http://127.0.0.1:7890 user password"
 ```
 
 如果你需要指定其他环境变量，请自行在上述命令中增加 `-e 环境变量=环境变量值` 来指定。

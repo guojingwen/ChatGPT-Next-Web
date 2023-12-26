@@ -15,8 +15,6 @@ FROM base AS builder
 
 RUN apk update && apk add --no-cache git
 
-ENV OPENAI_API_KEY=""
-
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -26,8 +24,6 @@ RUN yarn build
 FROM base AS runner
 WORKDIR /app
 
-
-ENV OPENAI_API_KEY=""
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./

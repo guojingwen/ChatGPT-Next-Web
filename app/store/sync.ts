@@ -11,12 +11,6 @@ import { downloadAs, readFromFile } from "../utils";
 import { showToast } from "../components/ui-lib";
 import Locale from "../locales";
 
-export interface WebDavConfig {
-  server: string;
-  username: string;
-  password: string;
-}
-
 export type SyncStore = GetStoreState<typeof useSyncStore>;
 
 export const useSyncStore = createPersistStore(

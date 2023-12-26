@@ -1,14 +1,12 @@
 import * as mysql from "mysql";
-// import { normal } from '../lib/logger'
 
 const { DB_HOST, DB_PORT, DB_PASSWORD, DB_NAME } = process.env;
 
-// const logger = normal()
 const logger = console;
 
 const dbConnection = {
   host: DB_HOST,
-  port: +DB_PORT!,
+  port: +DB_PORT,
   user: "root",
   password: DB_PASSWORD,
   database: DB_NAME,

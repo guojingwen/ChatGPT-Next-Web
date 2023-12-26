@@ -1,4 +1,4 @@
-import { ChatMessage, ModelType, useAccessStore } from "../store";
+import { ModelType } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 import { MyResponse, ResUserInfo, WxResError, WxSign } from "../apiType";
 
@@ -52,18 +52,6 @@ interface Model {
   name: string;
   provider: ProviderName;
   ctxlen: number;
-}
-
-interface ChatProvider {
-  name: ProviderName;
-  apiConfig: {
-    baseUrl: string;
-    summaryModel: Model;
-  };
-  models: Model[];
-
-  chat: () => void;
-  usage: () => void;
 }
 
 export class ClientApi {

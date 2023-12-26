@@ -43,7 +43,6 @@ async function handle(
 
     return response;
   } catch (e) {
-    console.error("[OpenAI] ", e);
     return NextResponse.json(prettyObject(e));
   }
 }

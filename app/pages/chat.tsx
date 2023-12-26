@@ -27,7 +27,6 @@ import {
   SubmitKey,
   useChatStore,
   createMessage,
-  useAccessStore,
   Theme,
   useAppConfig,
   ModelType,
@@ -645,7 +644,6 @@ function _Chat() {
   const context: RenderMessage[] = useMemo(() => {
     return session.mask.hideContext ? [] : session.mask.context.slice();
   }, [session.mask.context, session.mask.hideContext]);
-  const accessStore = useAccessStore();
 
   // preview messages
   const renderMessages = useMemo(() => {

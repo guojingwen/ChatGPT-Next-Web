@@ -8,7 +8,6 @@ const client = new OpenAI({
 export async function apiSpeechToText(
   params: SpeechTextParams,
 ): Promise<Uint8Array[]> {
-  console.log("----", process.env.FLUENTFFMPEG_COV);
   const audio: any = await client.audio.speech.create(params);
   /**
    * 注意 ubuntu 要安装 ffmpeg
@@ -21,7 +20,7 @@ export async function apiSpeechToText(
       // .outputOptions('-vn', '-ar', '44100', '-ac', '2', '-ab', '192k') // 设置输出为音频参数
       .toFormat("mp3")
       .pipe()
-      .on("data", (chunk) => {
+      .on("data", (chunk: Uint8Array) => {
         chunks.push(chunk);
       })
       .on("end", () => {

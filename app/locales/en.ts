@@ -2,8 +2,6 @@ import { SubmitKey } from "../store/config";
 import { getDeviceInfo } from "../utils";
 import { LocaleType } from "./index";
 
-// if you are adding a new translation, please use PartialLocaleType instead of LocaleType
-
 const en: LocaleType = {
   WIP: "Coming Soon...",
   ChatItem: {
@@ -65,24 +63,6 @@ const en: LocaleType = {
     IsContext: "Contextual Prompt",
   },
   Export: {
-    Title: "Export Messages",
-    Copy: "Copy All",
-    Download: "Download",
-    MessageFromYou: "Message From You",
-    MessageFromChatGPT: "Message From ChatGPT",
-    Share: "Share to ShareGPT",
-    Format: {
-      Title: "Export Format",
-      SubTitle: "Markdown or PNG Image",
-    },
-    IncludeContext: {
-      Title: "Including Context",
-      SubTitle: "Export context prompts in mask or not",
-    },
-    Steps: {
-      Select: "Select",
-      Preview: "Preview",
-    },
     Image: {
       Toast: "Capturing Image...",
       Modal: "Long press or right click to save image",
