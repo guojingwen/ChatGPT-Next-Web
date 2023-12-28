@@ -24,6 +24,8 @@ import { ModelConfigList } from "../components/model-config";
 import { IconButton } from "../components/button";
 import { SubmitKey, useChatStore, Theme, useAppConfig } from "../store";
 
+import { importFile, exportFile } from "../utils/syncFile";
+
 import Locale, {
   AllLangs,
   ALL_LANG_OPTIONS,
@@ -35,7 +37,6 @@ import { Path } from "../constant";
 import { Prompt, SearchService, usePromptStore } from "../store/prompt";
 import { ErrorBoundary } from "../components/error";
 import { InputRange } from "../components/input-range";
-import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";
 
@@ -232,7 +233,6 @@ function DangerItems() {
 }
 
 function SyncItems() {
-  const syncStore = useSyncStore();
   const chatStore = useChatStore();
   const promptStore = usePromptStore();
   const maskStore = useMaskStore();
@@ -261,14 +261,14 @@ function SyncItems() {
               icon={<UploadIcon />}
               text={Locale.UI.Export}
               onClick={() => {
-                syncStore.export();
+                exportFile();
               }}
             />
             <IconButton
               icon={<DownloadIcon />}
               text={Locale.UI.Import}
               onClick={() => {
-                syncStore.import();
+                importFile();
               }}
             />
           </div>

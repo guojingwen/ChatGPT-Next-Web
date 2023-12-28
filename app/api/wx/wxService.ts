@@ -2,6 +2,7 @@ import { ReplaceKeyByType } from "@/app/types/utils";
 import { TicketRecord, WxSdkTicketRes, WxSdkTokenRes } from "@/app/types/wxapi";
 import { formatDate } from "@/app/utils/format";
 import { exeScript } from "../dbUtils";
+import { JsTicket } from "@/app/types/global";
 const { APPID, APPSECRET } = process.env;
 
 export async function setTicket(): Promise<null> {

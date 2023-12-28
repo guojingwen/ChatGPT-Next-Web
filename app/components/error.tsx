@@ -3,7 +3,7 @@ import { IconButton } from "./button";
 import ResetIcon from "../icons/reload.svg";
 import Locale from "../locales";
 import { showConfirm } from "./ui-lib";
-import { useSyncStore } from "../store/sync";
+import { exportFile } from "../utils/syncFile";
 
 interface IErrorBoundaryState {
   hasError: boolean;
@@ -25,7 +25,7 @@ export class ErrorBoundary extends React.Component<any, IErrorBoundaryState> {
 
   clearAndSaveData() {
     try {
-      useSyncStore.getState().export();
+      exportFile();
     } finally {
       localStorage.clear();
       location.reload();
