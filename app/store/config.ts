@@ -40,7 +40,6 @@ export const DEFAULT_CONFIG = {
   disablePromptHint: false,
 
   dontShowMaskSplashScreen: false, // dont show splash screen when create chat
-  hideBuiltinMasks: false, // dont add builtin masks
 
   models: DEFAULT_MODELS as any as LLMModel[],
 
@@ -129,11 +128,6 @@ export const useAppConfig = createPersistStore(
   }),
   {
     name: StoreKey.Config,
-    version: 3.9, // todo
-    migrate(persistedState, version) {
-      // 版本升级
-      const state = persistedState as ChatConfig;
-      return state as any;
-    },
+    version: 1,
   },
 );

@@ -143,10 +143,6 @@ const en: LocaleType = {
         Title: "Mask Splash Screen",
         SubTitle: "Show a mask splash screen before starting new chat",
       },
-      Builtin: {
-        Title: "Hide Builtin Masks",
-        SubTitle: "Hide builtin masks in mask list",
-      },
     },
     Prompt: {
       Disable: {
@@ -225,7 +221,6 @@ const en: LocaleType = {
     Edit: "Current Chat Settings",
     Add: "Add a Prompt",
     Clear: "Context Cleared",
-    Revert: "Revert",
   },
   Plugin: {
     Name: "Plugin",

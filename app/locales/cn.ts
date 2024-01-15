@@ -142,10 +142,6 @@ const cn = {
         Title: "面具启动页",
         SubTitle: "新建聊天时，展示面具启动页",
       },
-      Builtin: {
-        Title: "隐藏内置面具",
-        SubTitle: "在所有面具列表中隐藏内置面具",
-      },
     },
     Prompt: {
       Disable: {
@@ -220,7 +216,6 @@ const cn = {
     Edit: "当前对话设置",
     Add: "新增一条预设对话",
     Clear: "上下文已清除",
-    Revert: "恢复上下文",
   },
   Plugin: {
     Name: "插件",

@@ -121,21 +121,9 @@ function useSubmitHandler() {
 }
 
 function ClearContextDivider() {
-  const chatStore = useChatStore();
-
   return (
-    <div
-      className={styles["clear-context"]}
-      onClick={() =>
-        chatStore.updateCurrentSession(
-          (session) => (session.clearContextIndex = undefined),
-        )
-      }
-    >
+    <div className={styles["clear-context"]}>
       <div className={styles["clear-context-tips"]}>{Locale.Context.Clear}</div>
-      <div className={styles["clear-context-revert-btn"]}>
-        {Locale.Context.Revert}
-      </div>
     </div>
   );
 }
@@ -220,6 +208,7 @@ function useScrollToBottom() {
 }
 
 type InputType = "Keyboard" | "Voice";
+
 export function ChatActions(props: {
   showPromptModal: () => void;
   scrollToBottom: () => void;

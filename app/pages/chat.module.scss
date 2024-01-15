@@ -139,42 +139,10 @@
     rgba(0, 0, 0, 0)
   );
   mask-image: $linear;
-
-  @mixin show {
+  &-tips {
     transform: translateY(0);
     position: relative;
     transition: all ease 0.3s;
-    opacity: 1;
-  }
-
-  @mixin hide {
-    transform: translateY(-50%);
-    position: absolute;
-    transition: all ease 0.1s;
-    opacity: 0;
-  }
-
-  &-tips {
-    @include show;
-    opacity: 0.5;
-  }
-
-  &-revert-btn {
-    color: var(--primary);
-    @include hide;
-  }
-
-  &:hover {
-    opacity: 1;
-    border-color: var(--primary);
-
-    .clear-context-tips {
-      @include hide;
-    }
-
-    .clear-context-revert-btn {
-      @include show;
-    }
   }
 }
 
