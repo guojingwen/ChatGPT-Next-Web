@@ -1,4 +1,4 @@
-import { ChatSession, useAppConfig, useChatStore } from "../store";
+import { useAppConfig, useChatStore } from "../store";
 import { useMaskStore } from "../store/mask";
 import { usePromptStore } from "../store/prompt";
 import { StoreKey } from "../constant";
@@ -45,71 +45,6 @@ export type AppState = {
   >;
 };
 
-type Merger<T extends keyof AppState, U = AppState[T]> = (
-  localState: U,
-  remoteState: U,
-) => U;
-
-type StateMerger = {
-  [K in keyof AppState]: Merger<K>;
-};
-
-// we merge remote state to local state
-const MergeStates: StateMerger = {
-  [StoreKey.Chat]: (localState, remoteState) => {
-    // merge sessions
-    const localSessions: Record<string, ChatSession> = {};
-    localState.sessions.forEach((s) => (localSessions[s.id] = s));
-
-    remoteState.sessions.forEach((remoteSession) => {
-      // skip empty chats
-      if (remoteSession.messages.length === 0) return;
-
-      const localSession = localSessions[remoteSession.id];
-      if (!localSession) {
-        // if remote session is new, just merge it
-        localState.sessions.push(remoteSession);
-      } else {
-        // if both have the same session id, merge the messages
-        const localMessageIds = new Set(localSession.messages.map((v) => v.id));
-        remoteSession.messages.forEach((m) => {
-          if (!localMessageIds.has(m.id)) {
-            localSession.messages.push(m);
-          }
-        });
-
-        // sort local messages with date field in asc order
-        localSession.messages.sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-        );
-      }
-    });
-
-    // sort local sessions with date field in desc order
-    localState.sessions.sort(
-      (a, b) =>
-        new Date(b.lastUpdate).getTime() - new Date(a.lastUpdate).getTime(),
-    );
-
-    return localState;
-  },
-  [StoreKey.Prompt]: (localState, remoteState) => {
-    localState.prompts = {
-      ...remoteState.prompts,
-      ...localState.prompts,
-    };
-    return localState;
-  },
-  [StoreKey.Mask]: (localState, remoteState) => {
-    localState.masks = {
-      ...remoteState.masks,
-      ...localState.masks,
-    };
-    return localState;
-  },
-  [StoreKey.Config]: mergeWithUpdate<AppState[StoreKey.Config]>,
-};
-
 export function getLocalAppState() {
   const appState = Object.fromEntries(
     Object.entries(LocalStateGetters).map(([key, getter]) => {
@@ -118,23 +53,6 @@ export function getLocalAppState() {
   ) as AppState;
 
   return appState;
-}
-
-export function setLocalAppState(appState: AppState) {
-  Object.entries(LocalStateSetters).forEach(([key, setter]) => {
-    setter(appState[key as keyof AppState]);
-  });
-}
-
-export function mergeAppState(localState: AppState, remoteState: AppState) {
-  Object.keys(localState).forEach(<T extends keyof AppState>(k: string) => {
-    const key = k as T;
-    const localStoreState = localState[key];
-    const remoteStoreState = remoteState[key];
-    MergeStates[key](localStoreState, remoteStoreState);
-  });
-
-  return localState;
 }
 
 /**

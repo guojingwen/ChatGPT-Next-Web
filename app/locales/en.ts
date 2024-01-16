@@ -247,7 +247,6 @@ const en: LocaleType = {
     EditModal: {
       Title: (readonly: boolean) =>
         `Edit Prompt Template ${readonly ? "(readonly)" : ""}`,
-      Download: "Download",
       Clone: "Clone",
     },
     Config: {
@@ -281,8 +280,6 @@ const en: LocaleType = {
     Close: "Close",
     Create: "Create",
     Edit: "Edit",
-    Export: "Export",
-    Import: "Import",
     Sync: "Sync",
   },
   Exporter: {

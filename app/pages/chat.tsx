@@ -23,7 +23,6 @@ import AudioIcon from "../icons/audio.svg";
 import { fetchSpeechText } from "../client/platforms/openai";
 
 import {
-  ChatMessage,
   SubmitKey,
   useChatStore,
   createMessage,
@@ -51,22 +50,25 @@ import Locale from "../locales";
 import { IconButton } from "../components/button";
 import styles from "./chat.module.scss";
 
-import { Selector, Toast, showToast } from "../components/ui-lib";
+import { Selector, showToast } from "../components/ui-lib";
 import {
   CHAT_PAGE_SIZE,
   LAST_INPUT_KEY,
   Path,
-  REQUEST_TIMEOUT_MS,
   UNFINISHED_INPUT,
 } from "../constant";
 import { Avatar } from "../components/emoji";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
-import { prettyObject } from "../utils/format";
 import { useAllModels } from "../utils/hooks";
 import Header from "../components/header";
 import PromptHints, { type RenderPompt } from "../components/prompt-hints";
 import MaskAvatar from "../components/mask-avatar";
 import SessionConfigModel from "../components/session-config-model";
+import {
+  ChatMessage,
+  deleteMessage,
+  getMessagesBySessionId,
+} from "../store/message";
 
 const Markdown = dynamic(
   async () => (await import("../components/markdown")).Markdown,
@@ -334,12 +336,8 @@ export function ChatActions(props: {
         icon={<BreakIcon />}
         onClick={() => {
           chatStore.updateCurrentSession((session) => {
-            if (session.clearContextIndex === session.messages.length) {
-              session.clearContextIndex = undefined;
-            } else {
-              session.clearContextIndex = session.messages.length;
-              session.memoryPrompt = ""; // will clear memory
-            }
+            session.clearContextIndex = session.msgCount;
+            session.memoryPrompt = ""; // will clear memory
           });
         }}
       />
@@ -401,6 +399,7 @@ function _Chat() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   // prompt hints
   const promptStore = usePromptStore();
@@ -442,9 +441,8 @@ function _Chat() {
     prev: () => chatStore.nextSession(-1),
     next: () => chatStore.nextSession(1),
     clear: () =>
-      // todo IndexedDB length问题
       chatStore.updateCurrentSession(
-        (session) => (session.clearContextIndex = session.messages.length),
+        (session) => (session.clearContextIndex = session.msgCount),
       ),
     del: () => chatStore.deleteSession(chatStore.currentSessionIndex),
   });
@@ -537,30 +535,20 @@ function _Chat() {
     }
   };
 
-  const deleteMessage = (msgId?: string) => {
-    // todo IndexedDB
-    chatStore.updateCurrentSession(
-      (session) =>
-        (session.messages = session.messages.filter((m) => m.id !== msgId)),
-    );
-  };
-
   const onDelete = (msgId: string) => {
     deleteMessage(msgId);
   };
 
-  const onResend = (message: ChatMessage) => {
+  const onResend = async (message: ChatMessage) => {
     // when it is resending a message
     // 1. for a user's message, find the next bot response
     // 2. for a bot's message, find the last user's input
     // 3. delete original user input and bot's message
     // 4. resend the user's input
+    const messages = await getMessagesBySessionId(message.sessionId);
+    const resendingIndex = messages.findIndex((m) => m.id === message.id);
 
-    const resendingIndex = session.messages.findIndex(
-      (m) => m.id === message.id,
-    );
-
-    if (resendingIndex < 0 || resendingIndex >= session.messages.length) {
+    if (resendingIndex < 0 || resendingIndex >= messages.length) {
       console.error("[Chat] failed to find resending message", message);
       return;
     }
@@ -572,17 +560,17 @@ function _Chat() {
       // if it is resending a bot's message, find the user input for it
       botMessage = message;
       for (let i = resendingIndex; i >= 0; i -= 1) {
-        if (session.messages[i].role === "user") {
-          userMessage = session.messages[i];
+        if (messages[i].role === "user") {
+          userMessage = messages[i];
           break;
         }
       }
     } else if (message.role === "user") {
       // if it is resending a user's input, find the bot's response
       userMessage = message;
-      for (let i = resendingIndex; i < session.messages.length; i += 1) {
-        if (session.messages[i].role === "assistant") {
-          botMessage = session.messages[i];
+      for (let i = resendingIndex; i < messages.length; i += 1) {
+        if (messages[i].role === "assistant") {
+          botMessage = messages[i];
           break;
         }
       }
@@ -595,7 +583,8 @@ function _Chat() {
 
     // delete the original messages
     deleteMessage(userMessage.id);
-    deleteMessage(botMessage?.id);
+    const bId = botMessage?.id;
+    bId && deleteMessage(bId);
 
     // resend the message
     setIsLoading(true);
@@ -610,7 +599,7 @@ function _Chat() {
   // preview messages
   const renderMessages = useMemo(() => {
     return context
-      .concat(session.messages as RenderMessage[])
+      .concat(messages as RenderMessage[])
       .concat(
         isLoading
           ? [
@@ -637,13 +626,7 @@ function _Chat() {
             ]
           : [],
       );
-  }, [
-    config.sendPreviewBubble,
-    context,
-    isLoading,
-    session.messages,
-    userInput,
-  ]);
+  }, [config.sendPreviewBubble, context, isLoading, messages, userInput]);
 
   const [msgRenderIndex, _setMsgRenderIndex] = useState(
     Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
@@ -654,7 +637,7 @@ function _Chat() {
     _setMsgRenderIndex(newIndex);
   }
 
-  const messages = useMemo(() => {
+  const _messages = useMemo(() => {
     const endRenderIndex = Math.min(
       msgRenderIndex + 3 * CHAT_PAGE_SIZE,
       renderMessages.length,
@@ -741,7 +724,8 @@ function _Chat() {
   };
   let localId: string | null = null;
   useEffect(() => {
-    window.wx.onVoiceRecordEnd({
+    // ?. 适配PC环境
+    window.wx?.onVoiceRecordEnd({
       // 录音时间超过一分钟没有停止的时候会执行 complete 回调
       complete: function (res: { localId: string }) {
         showToast("微信限制，录音时间超过一分钟自动停止");
@@ -800,7 +784,7 @@ function _Chat() {
           setAutoScroll(false);
         }}
       >
-        {messages.map((message, i) => {
+        {_messages.map((message, i) => {
           const isUser = message.role === "user";
           const isContext = i < context.length;
           const showActions =

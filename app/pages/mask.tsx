@@ -3,8 +3,6 @@ import { ErrorBoundary } from "../components/error";
 
 import styles from "./mask.module.scss";
 
-import DownloadIcon from "../icons/download.svg";
-import UploadIcon from "../icons/upload.svg";
 import EditIcon from "../icons/edit.svg";
 import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
@@ -15,7 +13,6 @@ import DragIcon from "../icons/drag.svg";
 
 import { Mask, useMaskStore } from "../store/mask";
 import {
-  ChatMessage,
   createMessage,
   ModelConfig,
   useAppConfig,
@@ -35,7 +32,7 @@ import { AvatarPicker } from "../components/emoji";
 import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
 
 import { useMemo, useState } from "react";
-import { downloadAs, readFromFile, useNavigate } from "../utils";
+import { useNavigate } from "../utils";
 import { Updater } from "../typing";
 import { ModelConfigList } from "../components/model-config";
 import { FileName, Path } from "../constant";
@@ -47,6 +44,7 @@ import {
   OnDragEndResponder,
 } from "@hello-pangea/dnd";
 import MaskAvatar from "../components/mask-avatar";
+import { ChatMessage } from "../store/message";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -390,30 +388,6 @@ export function MaskPage() {
     maskStore.get(editingMaskId) ?? BUILTIN_MASK_STORE.get(editingMaskId);
   const closeMaskModal = () => setEditingMaskId(undefined);
 
-  const downloadAll = () => {
-    downloadAs(JSON.stringify(masks.filter((v) => !v.builtin)), FileName.Masks);
-  };
-
-  const importFromFile = () => {
-    readFromFile().then((content) => {
-      try {
-        const importMasks = JSON.parse(content);
-        if (Array.isArray(importMasks)) {
-          for (const mask of importMasks) {
-            if (mask.name) {
-              maskStore.create(mask);
-            }
-          }
-          return;
-        }
-        //if the content is a single mask.
-        if (importMasks.name) {
-          maskStore.create(importMasks);
-        }
-      } catch {}
-    });
-  };
-
   const customMasks = useMemo(() => {
     return allMasks.filter((v) => !v.builtin);
   }, [allMasks]);
@@ -432,25 +406,6 @@ export function MaskPage() {
           </div>
 
           <div className="window-actions">
-            {customMasks.length ? (
-              <div className="window-action-button">
-                <IconButton
-                  icon={<DownloadIcon />}
-                  bordered
-                  onClick={downloadAll}
-                  text={Locale.UI.Export}
-                />
-              </div>
-            ) : null}
-
-            <div className="window-action-button">
-              <IconButton
-                icon={<UploadIcon />}
-                text={Locale.UI.Import}
-                bordered
-                onClick={() => importFromFile()}
-              />
-            </div>
             <div className="window-action-button">
               <IconButton
                 icon={<CloseIcon />}
@@ -566,18 +521,6 @@ export function MaskPage() {
             title={Locale.Mask.EditModal.Title(editingMask?.builtin)}
             onClose={closeMaskModal}
             actions={[
-              <IconButton
-                icon={<DownloadIcon />}
-                text={Locale.Mask.EditModal.Download}
-                key="export"
-                bordered
-                onClick={() =>
-                  downloadAs(
-                    JSON.stringify(editingMask),
-                    `${editingMask.name}.json`,
-                  )
-                }
-              />,
               <IconButton
                 key="copy"
                 icon={<CopyIcon />}

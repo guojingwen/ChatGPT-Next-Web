@@ -72,7 +72,7 @@ export default function Header() {
           )}
         </div>
         <div className="window-header-sub-title">
-          {Locale.Chat.SubTitle(session.messages.length)}
+          {Locale.Chat.SubTitle(session.msgCount)}
         </div>
       </div>
       <div className={`window-actions ${styles["header-right"]}`}>

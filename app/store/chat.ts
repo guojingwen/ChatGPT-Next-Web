@@ -2,23 +2,21 @@ import { trimTopic } from "../utils";
 
 import Locale from "../locales";
 import { showToast } from "../components/ui-lib";
-import { ModelType, useAppConfig } from "./config";
+import { useAppConfig } from "./config";
 import { createEmptyMask, Mask } from "./mask";
 import { StoreKey, SUMMARIZE_MODEL } from "../constant";
-import { api, RequestMessage } from "../client/api";
+import { api } from "../client/api";
 import { ChatControllerPool } from "../client/controller";
 import { prettyObject } from "../utils/format";
 import { estimateTokenLength } from "../utils/token";
 import { nanoid } from "nanoid";
 import { createPersistStore } from "../utils/store";
-
-export type ChatMessage = RequestMessage & {
-  date: string;
-  streaming?: boolean;
-  isError?: boolean;
-  id: string;
-  model?: ModelType;
-};
+import {
+  ChatMessage,
+  getMessagesBySessionId,
+  removeMessagesBySessionId,
+  updateMessage,
+} from "./message";
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
   return {
@@ -27,6 +25,7 @@ export function createMessage(override: Partial<ChatMessage>): ChatMessage {
     role: "user",
     content: "",
     ...override,
+    sessionId: override.id!,
   };
 }
 
@@ -41,11 +40,12 @@ export interface ChatSession {
   topic: string;
 
   memoryPrompt: string;
-  messages: ChatMessage[];
   stat: ChatStat;
   lastUpdate: number;
   lastSummarizeIndex: number;
   clearContextIndex?: number;
+  lastMsgId: string;
+  msgCount: number;
 
   mask: Mask;
 }
@@ -57,7 +57,6 @@ function createEmptySession(): ChatSession {
     id: nanoid(),
     topic: DEFAULT_TOPIC,
     memoryPrompt: "",
-    messages: [],
     stat: {
       tokenCount: 0,
       wordCount: 0,
@@ -65,6 +64,8 @@ function createEmptySession(): ChatSession {
     },
     lastUpdate: Date.now(),
     lastSummarizeIndex: 0,
+    lastMsgId: "",
+    msgCount: 0,
 
     mask: createEmptyMask(),
   };
@@ -214,10 +215,7 @@ export const useChatStore = createPersistStore(
       },
 
       onNewMessage(message: ChatMessage) {
-        debugger;
         get().updateCurrentSession((session) => {
-          // todo IndexedDB  ?
-          session.messages = session.messages.concat();
           session.lastUpdate = Date.now();
         });
         get().updateStat(message);
@@ -225,8 +223,6 @@ export const useChatStore = createPersistStore(
       },
 
       async onUserInput(content: string) {
-        // todo IndexedDB
-        debugger;
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -241,46 +237,48 @@ export const useChatStore = createPersistStore(
           model: modelConfig.model,
         });
 
-        // get recent messages
-        const recentMessages = get().getMessagesWithMemory();
+        const recentMessages = await get().getMessagesWithMemory();
         const sendMessages = recentMessages.concat(userMessage);
-        // todo  从IndexedDB中取
-        const messageIndex = get().currentSession().messages.length + 1;
+        // const messageIndex =
+        //   (await get().getMessagesBySessionId(session.id)).length + 1;
+        // const messageIndex = session.msgCount;
 
         // save user's and bot's message
-        get().updateCurrentSession((session) => {
-          const savedUserMessage = {
+        await updateMessage(
+          {
             ...userMessage,
             content,
-          };
-          session.messages = session.messages.concat([
-            savedUserMessage,
-            botMessage,
-          ]);
+          },
+          "add",
+        );
+        await updateMessage(botMessage, "add");
+        get().updateCurrentSession((session) => {
+          // todo save
+          session.lastMsgId = botMessage.id;
+          session.msgCount += 2;
         });
 
         // make request
         api.llm.chat({
           messages: sendMessages,
           config: { ...modelConfig, stream: true },
-          onUpdate(message) {
+          onUpdate: (message) => {
             botMessage.streaming = true;
             if (message) {
               botMessage.content = message;
             }
-            get().updateCurrentSession((session) => {
-              session.messages = session.messages.concat();
-            });
+            updateMessage(botMessage);
           },
-          onFinish(message) {
+          onFinish: (message) => {
             botMessage.streaming = false;
             if (message) {
               botMessage.content = message;
+              updateMessage(botMessage);
               get().onNewMessage(botMessage);
             }
             ChatControllerPool.remove(session.id, botMessage.id);
           },
-          onError(error) {
+          onError: async (error) => {
             const isAborted = error.message.includes("aborted");
             botMessage.content +=
               "\n\n" +
@@ -291,21 +289,16 @@ export const useChatStore = createPersistStore(
             botMessage.streaming = false;
             userMessage.isError = !isAborted;
             botMessage.isError = !isAborted;
-            get().updateCurrentSession((session) => {
-              session.messages = session.messages.concat();
-            });
-            ChatControllerPool.remove(
-              session.id,
-              botMessage.id ?? messageIndex,
-            );
+            await updateMessage(userMessage);
+            await updateMessage(botMessage);
+            ChatControllerPool.remove(session.id, botMessage.id);
 
             console.error("[Chat] failed ", error);
           },
           onController(controller) {
-            // collect controller for stop/retry
             ChatControllerPool.addController(
               session.id,
-              botMessage.id ?? messageIndex,
+              botMessage.id,
               controller,
             );
           },
@@ -325,12 +318,12 @@ export const useChatStore = createPersistStore(
         } as ChatMessage;
       },
 
-      getMessagesWithMemory() {
+      async getMessagesWithMemory() {
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
         const clearContextIndex = session.clearContextIndex ?? 0;
-        const messages = session.messages.slice();
-        const totalMessageCount = session.messages.length;
+        const messages = await getMessagesBySessionId(session.id);
+        const totalMessageCount = messages.length;
 
         // in-context prompts
         const contextPrompts = session.mask.context.slice();
@@ -391,17 +384,17 @@ export const useChatStore = createPersistStore(
       resetSession() {
         // todo IndexedDB
         get().updateCurrentSession((session) => {
-          session.messages = [];
+          removeMessagesBySessionId(session.id);
           session.memoryPrompt = "";
         });
       },
 
-      summarizeSession() {
+      async summarizeSession() {
         const config = useAppConfig.getState();
         const session = get().currentSession();
 
         // remove error messages if any
-        const messages = session.messages;
+        const messages = await getMessagesBySessionId(session.id);
 
         // should summarize topic after chating more than 50 words
         const SUMMARIZE_MIN_LEN = 50;
@@ -452,7 +445,7 @@ export const useChatStore = createPersistStore(
         // add memory prompt
         toBeSummarizedMsgs.unshift(get().getMemoryPrompt());
 
-        const lastSummarizeIndex = session.messages.length;
+        const lastSummarizeIndex = messages.length;
 
         console.log(
           "[Chat History] ",
@@ -496,10 +489,8 @@ export const useChatStore = createPersistStore(
       },
 
       updateStat(message: ChatMessage) {
-        debugger;
         get().updateCurrentSession((session) => {
           session.stat.charCount += message.content.length;
-          // TODO: should update chat count and word count
         });
       },
 

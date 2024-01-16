@@ -242,7 +242,6 @@ const cn = {
     EditModal: {
       Title: (readonly: boolean) =>
         `编辑预设面具 ${readonly ? "（只读）" : ""}`,
-      Download: "下载预设",
       Clone: "克隆预设",
     },
     Config: {
@@ -279,8 +278,6 @@ const cn = {
     Close: "关闭",
     Create: "新建",
     Edit: "编辑",
-    Export: "导出",
-    Import: "导入",
     Sync: "同步",
   },
   Exporter: {

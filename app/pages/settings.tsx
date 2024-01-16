@@ -8,8 +8,6 @@ import CopyIcon from "../icons/copy.svg";
 import ClearIcon from "../icons/clear.svg";
 import EditIcon from "../icons/edit.svg";
 import EyeIcon from "../icons/eye.svg";
-import DownloadIcon from "../icons/download.svg";
-import UploadIcon from "../icons/upload.svg";
 
 import {
   Input,
@@ -23,8 +21,6 @@ import { ModelConfigList } from "../components/model-config";
 
 import { IconButton } from "../components/button";
 import { SubmitKey, useChatStore, Theme, useAppConfig } from "../store";
-
-import { importFile, exportFile } from "../utils/syncFile";
 
 import Locale, {
   AllLangs,
@@ -239,7 +235,7 @@ function SyncItems() {
 
   const stateOverview = useMemo(() => {
     const sessions = chatStore.sessions;
-    const messageCount = sessions.reduce((p, c) => p + c.messages.length, 0);
+    const messageCount = sessions.reduce((p, c) => p + c.msgCount, 0);
 
     return {
       chat: sessions.length,
@@ -255,24 +251,7 @@ function SyncItems() {
         <ListItem
           title={Locale.Settings.Sync.LocalState}
           subTitle={Locale.Settings.Sync.Overview(stateOverview)}
-        >
-          <div style={{ display: "flex" }}>
-            <IconButton
-              icon={<UploadIcon />}
-              text={Locale.UI.Export}
-              onClick={() => {
-                exportFile();
-              }}
-            />
-            <IconButton
-              icon={<DownloadIcon />}
-              text={Locale.UI.Import}
-              onClick={() => {
-                importFile();
-              }}
-            />
-          </div>
-        </ListItem>
+        ></ListItem>
       </List>
     </>
   );

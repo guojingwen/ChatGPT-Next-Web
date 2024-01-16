@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChatMessage, useAppConfig, useChatStore } from "../store";
+import { useAppConfig, useChatStore } from "../store";
 import { Updater } from "../typing";
 import { IconButton } from "./button";
 import { Avatar } from "./emoji";
@@ -8,6 +8,7 @@ import MaskAvatar from "./mask-avatar";
 import Locale from "../locales";
 
 import styles from "./message-selector.module.scss";
+import { ChatMessage, getMessagesBySessionId } from "../store/message";
 
 function useShiftRange() {
   const [startIndex, setStartIndex] = useState<number>();
@@ -74,13 +75,17 @@ export function MessageSelector(props: {
   const chatStore = useChatStore();
   const session = chatStore.currentSession();
   const isValid = (m: ChatMessage) => m.content && !m.isError && !m.streaming;
+  const [_messages, setMessages] = useState<ChatMessage[]>([]);
+  useEffect(() => {
+    getMessagesBySessionId(session.id).then(setMessages);
+  }, [session.id]);
   const allMessages = useMemo(() => {
     let startIndex = Math.max(0, session.clearContextIndex ?? 0);
-    if (startIndex === session.messages.length - 1) {
+    if (startIndex === session.msgCount - 1) {
       startIndex = 0;
     }
-    return session.messages.slice(startIndex);
-  }, [session.messages, session.clearContextIndex]);
+    return _messages.slice(startIndex);
+  }, [_messages, session.clearContextIndex, session.msgCount]);
 
   const messages = useMemo(
     () =>
