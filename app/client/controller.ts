@@ -4,7 +4,7 @@ export const ChatControllerPool = {
 
   addController(
     sessionId: string,
-    messageId: string,
+    messageId: number,
     controller: AbortController,
   ) {
     const key = this.key(sessionId, messageId);
@@ -12,7 +12,7 @@ export const ChatControllerPool = {
     return key;
   },
 
-  stop(sessionId: string, messageId: string) {
+  stop(sessionId: string, messageId: number) {
     const key = this.key(sessionId, messageId);
     const controller = this.controllers[key];
     controller?.abort();
@@ -26,12 +26,12 @@ export const ChatControllerPool = {
     return Object.values(this.controllers).length > 0;
   },
 
-  remove(sessionId: string, messageId: string) {
+  remove(sessionId: string, messageId: number) {
     const key = this.key(sessionId, messageId);
     delete this.controllers[key];
   },
 
-  key(sessionId: string, messageIndex: string) {
+  key(sessionId: string, messageIndex: number) {
     return `${sessionId},${messageIndex}`;
   },
 };

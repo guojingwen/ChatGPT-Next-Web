@@ -19,13 +19,14 @@ import {
 } from "./message";
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
+  const date = new Date();
   return {
-    id: nanoid(),
-    date: new Date().toLocaleString(),
+    id: override.id || date.getTime(),
+    date: date.toLocaleString(),
     role: "user",
     content: "",
     ...override,
-    sessionId: override.id!,
+    sessionId: override.sessionId!,
   };
 }
 
@@ -44,7 +45,7 @@ export interface ChatSession {
   lastUpdate: number;
   lastSummarizeIndex: number;
   clearContextIndex?: number;
-  lastMsgId: string;
+  lastMsgId: number;
   msgCount: number;
 
   mask: Mask;
@@ -64,7 +65,7 @@ function createEmptySession(): ChatSession {
     },
     lastUpdate: Date.now(),
     lastSummarizeIndex: 0,
-    lastMsgId: "",
+    lastMsgId: -1,
     msgCount: 0,
 
     mask: createEmptyMask(),
@@ -220,89 +221,6 @@ export const useChatStore = createPersistStore(
         });
         get().updateStat(message);
         get().summarizeSession();
-      },
-
-      async onUserInput(content: string) {
-        const session = get().currentSession();
-        const modelConfig = session.mask.modelConfig;
-
-        const userMessage: ChatMessage = createMessage({
-          role: "user",
-          content,
-        });
-
-        const botMessage: ChatMessage = createMessage({
-          role: "assistant",
-          streaming: true,
-          model: modelConfig.model,
-        });
-
-        const recentMessages = await get().getMessagesWithMemory();
-        const sendMessages = recentMessages.concat(userMessage);
-        // const messageIndex =
-        //   (await get().getMessagesBySessionId(session.id)).length + 1;
-        // const messageIndex = session.msgCount;
-
-        // save user's and bot's message
-        await updateMessage(
-          {
-            ...userMessage,
-            content,
-          },
-          "add",
-        );
-        await updateMessage(botMessage, "add");
-        get().updateCurrentSession((session) => {
-          // todo save
-          session.lastMsgId = botMessage.id;
-          session.msgCount += 2;
-        });
-
-        // make request
-        api.llm.chat({
-          messages: sendMessages,
-          config: { ...modelConfig, stream: true },
-          onUpdate: (message) => {
-            botMessage.streaming = true;
-            if (message) {
-              botMessage.content = message;
-            }
-            updateMessage(botMessage);
-          },
-          onFinish: (message) => {
-            botMessage.streaming = false;
-            if (message) {
-              botMessage.content = message;
-              updateMessage(botMessage);
-              get().onNewMessage(botMessage);
-            }
-            ChatControllerPool.remove(session.id, botMessage.id);
-          },
-          onError: async (error) => {
-            const isAborted = error.message.includes("aborted");
-            botMessage.content +=
-              "\n\n" +
-              prettyObject({
-                error: true,
-                message: error.message,
-              });
-            botMessage.streaming = false;
-            userMessage.isError = !isAborted;
-            botMessage.isError = !isAborted;
-            await updateMessage(userMessage);
-            await updateMessage(botMessage);
-            ChatControllerPool.remove(session.id, botMessage.id);
-
-            console.error("[Chat] failed ", error);
-          },
-          onController(controller) {
-            ChatControllerPool.addController(
-              session.id,
-              botMessage.id,
-              controller,
-            );
-          },
-        });
       },
 
       getMemoryPrompt() {

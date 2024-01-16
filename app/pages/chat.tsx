@@ -59,7 +59,7 @@ import {
 } from "../constant";
 import { Avatar } from "../components/emoji";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
-import { useAllModels } from "../utils/hooks";
+import { useAllModels, useGetState } from "../utils/hooks";
 import Header from "../components/header";
 import PromptHints, { type RenderPompt } from "../components/prompt-hints";
 import MaskAvatar from "../components/mask-avatar";
@@ -68,7 +68,10 @@ import {
   ChatMessage,
   deleteMessage,
   getMessagesBySessionId,
+  updateMessage,
 } from "../store/message";
+import { api } from "../client/api";
+import { prettyObject } from "../utils/format";
 
 const Markdown = dynamic(
   async () => (await import("../components/markdown")).Markdown,
@@ -399,7 +402,10 @@ function _Chat() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages, getMessages] = useGetState<ChatMessage[]>([]);
+  useEffect(() => {
+    getMessagesBySessionId(session.id).then(setMessages);
+  }, [session.id]);
 
   // prompt hints
   const promptStore = usePromptStore();
@@ -477,12 +483,93 @@ function _Chat() {
       return;
     }
     setIsLoading(true);
-    chatStore.onUserInput(userInput).then(() => setIsLoading(false));
+    onUserInput(userInput).then(() => setIsLoading(false));
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
     if (!isMobileScreen) inputRef.current?.focus();
     setAutoScroll(true);
+  };
+  const onUserInput = async (content: string) => {
+    const session = chatStore.currentSession();
+    const modelConfig = session.mask.modelConfig;
+
+    const now = Date.now();
+    const userMessage: ChatMessage = createMessage({
+      role: "user",
+      content,
+      sessionId: session.id,
+      id: now,
+    });
+
+    const botMessage: ChatMessage = createMessage({
+      role: "assistant",
+      streaming: true,
+      model: modelConfig.model,
+      sessionId: session.id,
+      id: now + 1,
+    });
+    setMessages(getMessages().concat([userMessage, botMessage]));
+
+    await updateMessage(userMessage, "add");
+    await updateMessage(botMessage, "add");
+    chatStore.updateCurrentSession((session) => {
+      // todo save
+      session.lastMsgId = botMessage.id;
+      session.msgCount += 2;
+    });
+
+    // make request
+    const recentMessages = await chatStore.getMessagesWithMemory();
+    const sendMessages = recentMessages.concat(userMessage);
+    api.llm.chat({
+      messages: sendMessages,
+      config: { ...modelConfig, stream: true },
+      onUpdate: (message) => {
+        botMessage.streaming = true;
+        botMessage.content = message;
+        const lastMsg = { ...botMessage };
+        const msgs = getMessages();
+        setMessages(msgs.slice(0, msgs.length - 1).concat([lastMsg]));
+        updateMessage(botMessage);
+      },
+      onFinish: (message) => {
+        botMessage.streaming = false;
+        if (message) {
+          botMessage.content = message;
+          updateMessage(botMessage);
+          const lastMsg = { ...botMessage };
+          const msgs = getMessages();
+          setMessages(msgs.slice(0, msgs.length - 1).concat([lastMsg]));
+          chatStore.onNewMessage(botMessage);
+        }
+        ChatControllerPool.remove(session.id, botMessage.id);
+      },
+      onError: async (error) => {
+        const isAborted = error.message.includes("aborted");
+        botMessage.content +=
+          "\n\n" +
+          prettyObject({
+            error: true,
+            message: error.message,
+          });
+        botMessage.streaming = false;
+        userMessage.isError = !isAborted;
+        botMessage.isError = !isAborted;
+        await updateMessage(userMessage);
+        await updateMessage(botMessage);
+        const msgs = getMessages();
+        setMessages(
+          msgs.slice(0, msgs.length - 2).concat([userMessage, botMessage]),
+        );
+        ChatControllerPool.remove(session.id, botMessage.id);
+
+        console.error("[Chat] failed ", error);
+      },
+      onController(controller) {
+        ChatControllerPool.addController(session.id, botMessage.id, controller);
+      },
+    });
   };
 
   const onPromptSelect = (prompt: RenderPompt) => {
@@ -503,7 +590,7 @@ function _Chat() {
   };
 
   // stop response
-  const onUserStop = (messageId: string) => {
+  const onUserStop = (messageId: number) => {
     ChatControllerPool.stop(session.id, messageId);
   };
 
@@ -535,7 +622,7 @@ function _Chat() {
     }
   };
 
-  const onDelete = (msgId: string) => {
+  const onDelete = (msgId: number) => {
     deleteMessage(msgId);
   };
 
@@ -588,7 +675,7 @@ function _Chat() {
 
     // resend the message
     setIsLoading(true);
-    chatStore.onUserInput(userMessage.content).then(() => setIsLoading(false));
+    onUserInput(userMessage.content).then(() => setIsLoading(false));
     inputRef.current?.focus();
   };
 

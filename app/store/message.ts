@@ -8,7 +8,7 @@ export type ChatMessage = RequestMessage & {
   date: string;
   streaming?: boolean;
   isError?: boolean;
-  id: string;
+  id: number;
   model?: ModelType;
   sessionId: string;
 };
@@ -72,7 +72,7 @@ export async function updateMessage(
   const objectStore = transaction.objectStore(MESSAGE_STORE);
   objectStore[type](_msg);
 }
-export async function deleteMessage(id: string) {
+export async function deleteMessage(id: number) {
   const db = await dbInstance;
   const transaction = db.transaction([MESSAGE_STORE], "readwrite");
   const objectStore = transaction.objectStore(MESSAGE_STORE);
