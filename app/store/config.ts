@@ -100,31 +100,6 @@ export const useAppConfig = createPersistStore(
     reset() {
       set(() => ({ ...DEFAULT_CONFIG }));
     },
-
-    mergeModels(newModels: LLMModel[]) {
-      if (!newModels || newModels.length === 0) {
-        return;
-      }
-
-      const oldModels = get().models;
-      const modelMap: Record<string, LLMModel> = {};
-
-      for (const model of oldModels) {
-        model.available = false;
-        modelMap[model.name] = model;
-      }
-
-      for (const model of newModels) {
-        model.available = true;
-        modelMap[model.name] = model;
-      }
-
-      set(() => ({
-        models: Object.values(modelMap),
-      }));
-    },
-
-    allModels() {},
   }),
   {
     name: StoreKey.Config,

@@ -59,7 +59,7 @@ import {
 } from "../constant";
 import { Avatar } from "../components/emoji";
 import { ChatCommandPrefix, useChatCommand, useCommand } from "../command";
-import { useAllModels, useGetState } from "../utils/hooks";
+import { useGetState } from "../utils/hooks";
 import Header from "../components/header";
 import PromptHints, { type RenderPompt } from "../components/prompt-hints";
 import MaskAvatar from "../components/mask-avatar";
@@ -242,7 +242,7 @@ export function ChatActions(props: {
 
   // switch model
   const currentModel = chatStore.currentSession().mask.modelConfig.model;
-  const allModels = useAllModels();
+  const { models: allModels } = useAppConfig();
   const models = useMemo(
     () => allModels.filter((m) => m.available),
     [allModels],
