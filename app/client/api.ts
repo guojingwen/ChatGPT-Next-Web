@@ -32,26 +32,12 @@ export interface ChatOptions {
   onController?: (controller: AbortController) => void;
 }
 
-export interface LLMUsage {
-  used: number;
-  total: number;
-}
-
 export interface LLMModel {
   name: string;
   available: boolean;
 }
 export abstract class LLMApi {
   abstract chat(options: ChatOptions): Promise<void>;
-  abstract usage(): Promise<LLMUsage>;
-}
-
-type ProviderName = "openai" | "claude" | "palm";
-
-interface Model {
-  name: string;
-  provider: ProviderName;
-  ctxlen: number;
 }
 
 export class ClientApi {

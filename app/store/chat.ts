@@ -95,13 +95,6 @@ export const useChatStore = createPersistStore(
     }
 
     const methods = {
-      clearSessions() {
-        set(() => ({
-          sessions: [createEmptySession()],
-          currentSessionIndex: 0,
-        }));
-      },
-
       selectSession(index: number) {
         set({
           currentSessionIndex: index,
@@ -221,7 +214,9 @@ export const useChatStore = createPersistStore(
       },
 
       onNewMessage(message: ChatMessage) {
+        debugger;
         get().updateCurrentSession((session) => {
+          // todo IndexedDB  ?
           session.messages = session.messages.concat();
           session.lastUpdate = Date.now();
         });
@@ -230,6 +225,8 @@ export const useChatStore = createPersistStore(
       },
 
       async onUserInput(content: string) {
+        // todo IndexedDB
+        debugger;
         const session = get().currentSession();
         const modelConfig = session.mask.modelConfig;
 
@@ -247,6 +244,7 @@ export const useChatStore = createPersistStore(
         // get recent messages
         const recentMessages = get().getMessagesWithMemory();
         const sendMessages = recentMessages.concat(userMessage);
+        // todo  从IndexedDB中取
         const messageIndex = get().currentSession().messages.length + 1;
 
         // save user's and bot's message
@@ -390,19 +388,8 @@ export const useChatStore = createPersistStore(
         return recentMessages;
       },
 
-      updateMessage(
-        sessionIndex: number,
-        messageIndex: number,
-        updater: (message?: ChatMessage) => void,
-      ) {
-        const sessions = get().sessions;
-        const session = sessions.at(sessionIndex);
-        const messages = session?.messages;
-        updater(messages?.at(messageIndex));
-        set(() => ({ sessions }));
-      },
-
       resetSession() {
+        // todo IndexedDB
         get().updateCurrentSession((session) => {
           session.messages = [];
           session.memoryPrompt = "";
@@ -509,6 +496,7 @@ export const useChatStore = createPersistStore(
       },
 
       updateStat(message: ChatMessage) {
+        debugger;
         get().updateCurrentSession((session) => {
           session.stat.charCount += message.content.length;
           // TODO: should update chat count and word count
@@ -524,6 +512,7 @@ export const useChatStore = createPersistStore(
 
       clearAllData() {
         localStorage.clear();
+        // todo清理IndexedDB
         location.reload();
       },
     };
