@@ -20,7 +20,7 @@ import IconVoice from "../icons/voice.svg";
 import IconSelect from "../icons/select.svg";
 import AudioIcon from "../icons/audio.svg";
 
-import { fetchSpeechText } from "../client/platforms/openai";
+import { fetchSpeechText, fetchSpeechText2 } from "../client/platforms/openai";
 
 import {
   SubmitKey,
@@ -38,6 +38,7 @@ import {
   useMobileScreen,
   useNavigate,
   audioInst,
+  getDeviceInfo,
 } from "../utils";
 
 import dynamic from "next/dynamic";
@@ -72,6 +73,10 @@ import {
 } from "../store/message";
 import { api } from "../client/api";
 import { prettyObject } from "../utils/format";
+import { addAudio, getAudio, deleteAudio } from "../store/audioStore";
+import { sleep } from "openai/core";
+
+const device = getDeviceInfo();
 
 const Markdown = dynamic(
   async () => (await import("../components/markdown")).Markdown,
@@ -136,6 +141,7 @@ function ClearContextDivider() {
 function ChatAction(props: {
   text: string;
   icon: JSX.Element;
+  customClass?: string;
   onClick: () => void;
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
@@ -158,7 +164,9 @@ function ChatAction(props: {
 
   return (
     <div
-      className={`${styles["chat-input-action"]} clickable`}
+      className={`${styles["chat-input-action"]} ${
+        props.customClass ? styles[`chat-action-${props.customClass}`] : ""
+      } clickable`}
       onClick={() => {
         props.onClick();
         setTimeout(updateWidth, 1);
@@ -175,9 +183,11 @@ function ChatAction(props: {
       <div ref={iconRef} className={styles["icon"]}>
         {props.icon}
       </div>
-      <div className={styles["text"]} ref={textRef}>
-        {props.text}
-      </div>
+      {!device.isMobile && (
+        <div className={styles["text"]} ref={textRef}>
+          {props.text}
+        </div>
+      )}
     </div>
   );
 }
@@ -224,7 +234,6 @@ export function ChatActions(props: {
 }) {
   const config = useAppConfig();
   const chatStore = useChatStore();
-  const isMobileScreen = useMobileScreen();
 
   // switch themes
   const theme = config.theme;
@@ -264,7 +273,6 @@ export function ChatActions(props: {
   const [isGranted, setIsGranted] = useState<boolean>(
     window.isVoiceGrantPrivilege,
   );
-  const [isRecording, setIsRecording] = useState(false);
   const switchInputType = async () => {
     // 切到声音，未开启音频
     const isInput = props.inputType === "Keyboard";
@@ -350,7 +358,7 @@ export function ChatActions(props: {
         text={currentModel}
         icon={<RobotIcon />}
       />
-      {isMobileScreen && (
+      {device.isWeixin && (
         <ChatAction
           onClick={switchInputType}
           text={
@@ -402,9 +410,19 @@ function _Chat() {
   const [hitBottom, setHitBottom] = useState(true);
   const isMobileScreen = useMobileScreen();
   const navigate = useNavigate();
-  const [messages, setMessages, getMessages] = useGetState<ChatMessage[]>([]);
+  const [messages, _setMessages, getMessages] = useGetState<ChatMessage[]>([]);
+  const setMessages = (list: ChatMessage[]) => {
+    session.msgCount = list.length;
+    _setMessages(list);
+  };
   useEffect(() => {
-    getMessagesBySessionId(session.id).then(setMessages);
+    getMessagesBySessionId(session.id).then((list) => {
+      list.forEach((it) => {
+        const hasAudio = it.audioKey || it.audioIds?.length;
+        it.audioState = hasAudio ? "done" : "none";
+      });
+      setMessages(list);
+    });
   }, [session.id]);
 
   // prompt hints
@@ -514,9 +532,7 @@ function _Chat() {
     await updateMessage(userMessage, "add");
     await updateMessage(botMessage, "add");
     chatStore.updateCurrentSession((session) => {
-      // todo save
       session.lastMsgId = botMessage.id;
-      session.msgCount += 2;
     });
 
     // make request
@@ -533,7 +549,7 @@ function _Chat() {
         setMessages(msgs.slice(0, msgs.length - 1).concat([lastMsg]));
         updateMessage(botMessage);
       },
-      onFinish: (message) => {
+      onFinish: async (message) => {
         botMessage.streaming = false;
         if (message) {
           botMessage.content = message;
@@ -541,7 +557,11 @@ function _Chat() {
           const lastMsg = { ...botMessage };
           const msgs = getMessages();
           setMessages(msgs.slice(0, msgs.length - 1).concat([lastMsg]));
+          await sleep(20);
           chatStore.onNewMessage(botMessage);
+          if (inputType === "Voice") {
+            toSpeak(botMessage);
+          }
         }
         ChatControllerPool.remove(session.id, botMessage.id);
       },
@@ -622,58 +642,33 @@ function _Chat() {
     }
   };
 
-  const onDelete = (msgId: number) => {
-    deleteMessage(msgId);
+  const onDelete = async (message: ChatMessage) => {
+    const list = getMessages().slice();
+    const index = list.findIndex((it) => it.id === message.id);
+    list.splice(index, 1);
+    setMessages(list);
+    await deleteMessage(message.id);
+    if (message.audioKey) {
+      await deleteAudio(message.audioKey);
+    }
   };
 
   const onResend = async (message: ChatMessage) => {
-    // when it is resending a message
-    // 1. for a user's message, find the next bot response
-    // 2. for a bot's message, find the last user's input
-    // 3. delete original user input and bot's message
-    // 4. resend the user's input
+    // 1. 删除当前(AI)消息 和前一条（用户）消息
+    // 2. 重新发送
     const messages = await getMessagesBySessionId(message.sessionId);
     const resendingIndex = messages.findIndex((m) => m.id === message.id);
 
-    if (resendingIndex < 0 || resendingIndex >= messages.length) {
-      console.error("[Chat] failed to find resending message", message);
-      return;
+    const botMessage = messages[resendingIndex];
+    const userMessage = messages[resendingIndex - 1];
+    await deleteMessage(userMessage.id);
+    await deleteMessage(botMessage.id);
+    const list = getMessages();
+    list.splice(resendingIndex - 1, 2);
+    setMessages(list);
+    if (botMessage.audioKey) {
+      await deleteAudio(botMessage.audioKey);
     }
-
-    let userMessage: ChatMessage | undefined;
-    let botMessage: ChatMessage | undefined;
-
-    if (message.role === "assistant") {
-      // if it is resending a bot's message, find the user input for it
-      botMessage = message;
-      for (let i = resendingIndex; i >= 0; i -= 1) {
-        if (messages[i].role === "user") {
-          userMessage = messages[i];
-          break;
-        }
-      }
-    } else if (message.role === "user") {
-      // if it is resending a user's input, find the bot's response
-      userMessage = message;
-      for (let i = resendingIndex; i < messages.length; i += 1) {
-        if (messages[i].role === "assistant") {
-          botMessage = messages[i];
-          break;
-        }
-      }
-    }
-
-    if (userMessage === undefined) {
-      console.error("[Chat] failed to resend", message);
-      return;
-    }
-
-    // delete the original messages
-    deleteMessage(userMessage.id);
-    const bId = botMessage?.id;
-    bId && deleteMessage(bId);
-
-    // resend the message
     setIsLoading(true);
     onUserInput(userMessage.content).then(() => setIsLoading(false));
     inputRef.current?.focus();
@@ -729,7 +724,8 @@ function _Chat() {
       msgRenderIndex + 3 * CHAT_PAGE_SIZE,
       renderMessages.length,
     );
-    return renderMessages.slice(msgRenderIndex, endRenderIndex);
+    const list = renderMessages.slice(msgRenderIndex, endRenderIndex);
+    return list;
   }, [msgRenderIndex, renderMessages]);
 
   const onChatBodyScroll = (e: HTMLElement) => {
@@ -835,25 +831,75 @@ function _Chat() {
     });
   };
   async function toConvert(localId: string) {
-    // showToast(localId);
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
     window.wx.translateVoice({
       localId, // 需要识别的音频的本地Id，由录音相关接口获得
       isShowProgressTips: 0, // 默认为1，显示进度提示
       success: function (res: { translateResult: string }) {
         const text = res.translateResult;
-        // showToast(text);
         doSubmit(text);
       },
       error(err: any) {
-        // showToast("translateVoice失败");
+        showToast("微信语音识别错误");
       },
     });
   }
   const toSpeak = async (item: RenderMessage) => {
-    console.log("---toSpeak", item);
-    const { audioBase64 } = await fetchSpeechText(item.content);
-    audioInst.play(audioBase64);
+    if (item.audioState === "playing") {
+      audioInst.stop();
+      item.audioState = "done";
+      setMessages(getMessages().slice());
+      return;
+    }
+    const old = audioInst.getAddi() as RenderMessage;
+    if (old) {
+      audioInst.stop();
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(null);
+        }, 20);
+      });
+      const newList = getMessages().slice();
+      const index = newList.findIndex((it) => it.id === old.id);
+      newList.splice(index, 1, {
+        ...old,
+        audioState: "done",
+      });
+      setMessages(newList);
+    }
+    if (device.isAndroid) {
+      let audioBase64: string;
+      if (!item.audioKey) {
+        item.audioState = "loading";
+        setMessages(getMessages().slice());
+        const res = await fetchSpeechText(item.content);
+        audioBase64 = res.audioBase64;
+        const audioKey = await addAudio(audioBase64);
+        item.audioKey = audioKey;
+      } else {
+        audioBase64 = await getAudio(item.audioKey);
+      }
+      item.audioState = "playing";
+      setMessages(getMessages().slice());
+      updateMessage(item);
+      await audioInst.play(audioBase64, item);
+      item.audioState = "done";
+      setMessages(getMessages().slice());
+    } else {
+      let audioIds = item.audioIds;
+      if (!item.audioIds?.length) {
+        item.audioState = "loading";
+        setMessages(getMessages().slice());
+        const res = await fetchSpeechText2(item.content);
+        audioIds = await audioInst.downloadAudios(res.media_id);
+        item.audioIds = audioIds;
+        updateMessage(item);
+      }
+      item.audioState = "playing";
+      setMessages(getMessages().slice());
+      await audioInst.playIOS(audioIds, item);
+      item.audioState = "done";
+      setMessages(getMessages().slice());
+    }
   };
   return (
     <div className={styles.chat} key={session.id}>
@@ -930,17 +976,26 @@ function _Chat() {
                               <ChatAction
                                 text={Locale.Chat.Actions.Delete}
                                 icon={<DeleteIcon />}
-                                onClick={() => onDelete(message.id ?? i)}
+                                onClick={() => onDelete(message)}
                               />
                               <ChatAction
                                 text={Locale.Chat.Actions.Copy}
                                 icon={<CopyIcon />}
                                 onClick={() => copyToClipboard(message.content)}
                               />
-                              {!isUser ? (
+                              {!isUser && device.isWeixin ? (
                                 <ChatAction
+                                  customClass={message.audioState}
                                   text={Locale.Chat.Actions.Voice}
-                                  icon={<AudioIcon />}
+                                  icon={
+                                    <AudioIcon
+                                      className={
+                                        styles[
+                                          `chat-action-${message.audioState}`
+                                        ]
+                                      }
+                                    />
+                                  }
                                   onClick={() => toSpeak(message)}
                                 />
                               ) : null}

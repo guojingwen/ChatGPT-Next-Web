@@ -6,17 +6,16 @@ import { useAppConfig } from "./config";
 import { createEmptyMask, Mask } from "./mask";
 import { StoreKey, SUMMARIZE_MODEL } from "../constant";
 import { api } from "../client/api";
-import { ChatControllerPool } from "../client/controller";
-import { prettyObject } from "../utils/format";
 import { estimateTokenLength } from "../utils/token";
 import { nanoid } from "nanoid";
 import { createPersistStore } from "../utils/store";
 import {
   ChatMessage,
+  clearMesssage,
   getMessagesBySessionId,
   removeMessagesBySessionId,
-  updateMessage,
 } from "./message";
+import { clearAudio } from "./audioStore";
 
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
   const date = new Date();
@@ -27,6 +26,9 @@ export function createMessage(override: Partial<ChatMessage>): ChatMessage {
     content: "",
     ...override,
     sessionId: override.sessionId!,
+    audioKey: 0,
+    audioState: "none",
+    audioIds: [],
   };
 }
 
@@ -158,12 +160,12 @@ export const useChatStore = createPersistStore(
         get().selectSession(limit(i + delta));
       },
 
-      deleteSession(index: number) {
+      async deleteSession(index: number) {
         const deletingLastSession = get().sessions.length === 1;
         const deletedSession = get().sessions.at(index);
 
         if (!deletedSession) return;
-
+        await removeMessagesBySessionId(deletedSession.id);
         const sessions = get().sessions.slice();
         sessions.splice(index, 1);
 
@@ -299,14 +301,6 @@ export const useChatStore = createPersistStore(
         return recentMessages;
       },
 
-      resetSession() {
-        // todo IndexedDB
-        get().updateCurrentSession((session) => {
-          removeMessagesBySessionId(session.id);
-          session.memoryPrompt = "";
-        });
-      },
-
       async summarizeSession() {
         const config = useAppConfig.getState();
         const session = get().currentSession();
@@ -419,8 +413,13 @@ export const useChatStore = createPersistStore(
         set(() => ({ sessions }));
       },
 
-      clearAllData() {
-        localStorage.clear();
+      async clearAllData() {
+        if (localStorage) {
+          localStorage.clear();
+        }
+        await clearMesssage();
+        await clearAudio();
+
         // todo清理IndexedDB
         location.reload();
       },

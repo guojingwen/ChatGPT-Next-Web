@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { showToast } from "./components/ui-lib";
 import Locale from "./locales";
-
+const device = getDeviceInfo();
 export function trimTopic(topic: string) {
   // Fix an issue where double quotes still show in the Indonesian language
   // This will remove the specified punctuation from the end of the string
@@ -143,7 +143,7 @@ export function getDeviceInfo(): DeviceInfo {
     const ua = navigator.userAgent;
     const uaL = ua.toLocaleLowerCase();
     window.devices = {
-      isAndroid: /Android/.test(ua),
+      isAndroid: !/Android/.test(ua),
       isIos: /iphone|ipad|ipod/.test(uaL),
       isMobile: /Android|iPhone/i.test(ua),
       isSafari: /^((?!chrome|android).)*safari/i.test(ua),
@@ -181,18 +181,83 @@ export function useNavigate() {
 class AudioPlayImpl<T extends object = {}> {
   protected audioElement?: HTMLAudioElement;
   protected addition: T | null | undefined = null;
+  protected _reject: ((value: unknown) => void) | null | undefined = null;
   protected cb: Function | null | undefined = null;
+  protected localIds: string[] = [];
   public constructor() {
     if (typeof window !== "undefined") {
       this.audioElement = new window.Audio();
       this.audioElement.addEventListener("ended", () => this.ended());
     }
   }
-  play(src: string, addition?: T, cb?: Function) {
-    this.audioElement!.src = src;
-    this.addition = addition;
-    this.cb = cb;
-    this.audioElement!.play();
+  async play(src: string, addition: T): Promise<T> {
+    return new Promise((resolve) => {
+      this.audioElement!.src = src;
+      this.addition = addition;
+      this.cb = (arg: T) => {
+        resolve(arg);
+      };
+      this.audioElement!.play();
+    });
+  }
+  async downloadAudios(arr: string[]) {
+    const localIds: string[] = [];
+    for (let i = 0; i < arr.length; i++) {
+      const localId: string = await new Promise((resolve) => {
+        window.wx.downloadVoice({
+          serverId: arr[i], // 需要下载的音频的服务器端ID，由uploadVoice接口获得
+          isShowProgressTips: 0, // 默认为1，显示进度提示
+          success: function (res: any) {
+            resolve(res.localId); // 返回音频的本地ID
+          },
+          error: function (res: any) {
+            alert("downloadVoice error" + res.localId);
+          },
+        });
+      });
+      localIds.push(localId);
+    }
+    return localIds;
+  }
+  async playIOS(localIds: string[], addition: T) {
+    this.localIds = localIds.slice();
+    let localId: string;
+    try {
+      const racePromise = new Promise((resolve, reject) => {
+        this._reject = () => {
+          if (localId) {
+            window.wx.stopVoice({
+              localId,
+            });
+          }
+          reject();
+        };
+        this.addition = addition;
+      });
+      while (this.localIds.length) {
+        localId = this.localIds.shift()!;
+        window.wx.playVoice({
+          localId,
+        });
+        let _resolve: (value: unknown) => void;
+        window.wx.onVoicePlayEnd({
+          success: function (res: any) {
+            _resolve(res.localId);
+          },
+        });
+        await Promise.race([
+          new Promise((resolve) => {
+            _resolve = resolve;
+          }),
+          racePromise,
+        ]);
+      }
+      this.addition = null;
+      this.localIds = [];
+    } catch {
+      this.addition = null;
+      this.localIds = [];
+    }
   }
   private ended() {
     this.cb?.(this.addition);
@@ -200,14 +265,22 @@ class AudioPlayImpl<T extends object = {}> {
     this.cb = null;
   }
   stop() {
-    this.audioElement!.currentTime = 0;
-    this.audioElement!.pause();
-    this.addition = null;
-    this.cb = null;
+    if (device.isAndroid) {
+      this.audioElement!.currentTime = 0;
+      this.audioElement!.pause();
+      this.addition = null;
+      this.cb = null;
+    } else {
+      if (this._reject instanceof Function) {
+        this._reject(this.addition);
+      }
+      this.addition = null;
+      this.localIds = [];
+    }
   }
   getAddi(): T | null | undefined {
     return this.addition;
   }
 }
 
-export const audioInst = new AudioPlayImpl<object & { index: number }>();
+export const audioInst = new AudioPlayImpl<object>();

@@ -5,14 +5,15 @@ import { IconButton } from "../components/button";
 import ReturnIcon from "../icons/return.svg";
 import VIP from "../icons/vip.svg";
 import UserAvatar from "../icons/user-avatar.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Toast } from "../components/ui-lib";
 
 const DEFAULT_USER = {
-  isLogin: true,
+  isLogin: false,
   isVip: false,
   icon: "",
-  nickName: "多年以后",
-  mid: "4065",
+  nickName: "",
+  mid: "",
 };
 type IUser = typeof DEFAULT_USER;
 
@@ -41,11 +42,27 @@ function FunList() {
     </div>
   );
 }
-
+const isWeixin = /MicroMessenger/i.test(navigator.userAgent);
 function UserCard({ user }: { user: IUser }) {
+  useEffect(() => {
+    console.log("useEffect", location.search);
+  }, []);
+  const toLogin = () => {
+    if (isWeixin) {
+      const baseUrl = `${location.protocol}//${location.host}`;
+      const redirect_uri = encodeURIComponent(`${baseUrl}/#user`);
+      const authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize";
+      const scope = "snsapi_userinfo"; // snsapi_base 和 snsapi_userinfo
+      const targetUrl = `${authUrl}?appid=wx3cbe9e0250f0dd0d&redirect_uri=${redirect_uri}&response_type=code&scope=${scope}#wechat_redirect`;
+      location.replace(targetUrl);
+    } else {
+      Toast({ content: "目前只支持在微信上使用" });
+    }
+  };
   return (
     <div className={styles.user_card}>
       {user.icon ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img alt="avatar" src={user.icon} width={30} height={30} />
       ) : (
         <span className={styles.user_card_avatar}>
@@ -60,7 +77,9 @@ function UserCard({ user }: { user: IUser }) {
           {user.isVip ? <span>有效期：2024年6月5日</span> : null}
         </div>
       ) : (
-        <div className={styles.user_card_info}>点击登录</div>
+        <div className={styles.user_card_info} onClick={toLogin}>
+          点击登录
+        </div>
       )}
 
       <div className={styles.user_card_vip}>

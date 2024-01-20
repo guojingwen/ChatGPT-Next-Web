@@ -44,3 +44,14 @@ request.onsuccess = async function (event) {
 };
 
 export default dbInstance;
+
+export function makeResp(request: IDBRequest): Promise<null> {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = function (event) {
+      resolve(null);
+    };
+    request.onerror = function (err) {
+      reject(err);
+    };
+  });
+}

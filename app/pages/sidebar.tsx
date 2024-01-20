@@ -147,6 +147,10 @@ export function SideBar(props: { className?: string }) {
 
   useHotKey();
 
+  const toUser = () => {
+    showToast("开发中");
+  };
+
   return (
     <div
       className={`${styles.sidebar} ${props.className} ${
@@ -205,9 +209,10 @@ export function SideBar(props: { className?: string }) {
             <Link to={Path.Settings}>
               <IconButton icon={<SettingsIcon />} shadow />
             </Link>
-            <Link to={Path.User}>
+            <IconButton icon={<UserIcon />} shadow onClick={toUser} />
+            {/* <Link to={Path.User}>
               <IconButton icon={<UserIcon />} shadow />
-            </Link>
+            </Link> */}
           </div>
         </div>
         <div>

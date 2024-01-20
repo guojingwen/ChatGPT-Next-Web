@@ -210,6 +210,14 @@
       display: flex;
       flex-wrap: nowrap;
     }
+    .chat-action-loading {
+      opacity: 0.5;
+    }
+    .chat-action-playing {
+      fill: red;
+      color: red;
+      border-color: red;
+    }
   }
 }
 

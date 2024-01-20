@@ -7,6 +7,7 @@ import {
   fetchEventSource,
 } from "@fortaine/fetch-event-source";
 import { prettyObject } from "@/app/utils/format";
+import { ResWxUpload2 } from "@/app/api/openai/service";
 
 export interface OpenAIListModelResponse {
   object: string;
@@ -214,6 +215,7 @@ export async function fetchSpeechText(input: string) {
     voice: "alloy",
     input,
   };
+  console.log("fetchSpeechText");
   const res = await fetch("/api/openai/speechToText", {
     method: "POST",
     headers: {
@@ -222,6 +224,21 @@ export async function fetchSpeechText(input: string) {
     body: JSON.stringify(params),
   }).then((res) => res.json());
   return res as ResSpeechText;
+}
+export async function fetchSpeechText2(input: string) {
+  const params: SpeechTextParams = {
+    model: "tts-1",
+    voice: "alloy",
+    input,
+  };
+  const res = await fetch("/api/openai/speechToText2", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(params),
+  }).then((res) => res.json());
+  return res as ResWxUpload2;
 }
 export interface ResSpeechText {
   audioBase64: string;
