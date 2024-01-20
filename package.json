@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3002",
     "lint": "next lint",
     "prompts": "node ./scripts/fetch-prompts.mjs",
     "prepare": "husky install",
@@ -21,7 +21,6 @@
     "fluent-ffmpeg": "^2.1.2",
     "fuse.js": "^6.6.2",
     "html-to-image": "^1.11.11",
-    "https-proxy-agent": "^7.0.2",
     "mermaid": "^10.6.1",
     "mysql": "^2.18.1",
     "nanoid": "^5.0.3",

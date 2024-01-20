@@ -1,4 +1,4 @@
-export const OPENAI_BASE_URL = "https://api.openai.com";
+export const OPENAI_BASE_URL = "https://chatgpt4.trade";
 
 export enum Path {
   Home = "/",

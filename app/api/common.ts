@@ -1,11 +1,11 @@
 import fetch from "node-fetch";
 import { NextRequest } from "next/server";
 import { OPENAI_BASE_URL } from "../constant";
-import { HttpsProxyAgent } from "https-proxy-agent";
-export const isProd = process.env.NODE_ENV === "production";
-export const agent = isProd
-  ? new HttpsProxyAgent("http://localhost:40000")
-  : undefined;
+// import { HttpsProxyAgent } from "https-proxy-agent";
+// export const isProd = process.env.NODE_ENV === "production";
+// export const agent = isProd
+//   ? new HttpsProxyAgent("http://localhost:40000")
+//   : undefined;
 
 export async function requestOpenai(req: NextRequest) {
   const controller = new AbortController();
@@ -25,19 +25,19 @@ export async function requestOpenai(req: NextRequest) {
   );
 
   const fetchUrl = `${OPENAI_BASE_URL}/${path}`;
+  const body = await readStream(req.body!);
   const fetchOptions: any = {
-    agent,
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
       Authorization: `Bearer ${process.env.API_KEY}`,
     },
     method: req.method,
-    body: req.body,
+    body: body,
     // to fix #2485: https://stackoverflow.com/questions/55920957/cloudflare-worker-typeerror-one-time-use-body
-    redirect: "manual",
+    // redirect: "manual",
     // @ts-ignore
-    duplex: "half",
+    // duplex: "half",
     signal: controller.signal,
   };
 
@@ -58,6 +58,19 @@ export async function requestOpenai(req: NextRequest) {
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+export async function readStream(readableStream: ReadableStream<Uint8Array>) {
+  const reader = readableStream.getReader();
+  let chunks = []; // 用于存储数据块
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+
+  return new TextDecoder().decode(Buffer.concat(chunks));
 }
 
 export const runtime = "nodejs";
