@@ -9,12 +9,12 @@ export type ChatMessage = RequestMessage & {
   date: string;
   streaming?: boolean;
   isError?: boolean;
-  id: number;
+  id: string;
   model?: ModelType;
-  sessionId: string;
-  audioState: AudioState;
-  audioKey: number; // android or other
-  audioIds: string[]; // ios
+  sessionId?: string;
+  audioState?: AudioState;
+  audioKey?: number; // android or other
+  audioIds?: string[]; // ios
 };
 
 export async function getMessagesBySessionId(
@@ -54,7 +54,7 @@ export async function removeMessagesBySessionId(
       for (let item of list) {
         if (item.sessionId === sessionId) {
           objectStore.delete(item.id);
-          const key = item.audioKey;
+          const key = item.audioKey!;
           if (item.audioKey) {
             objectStoreA.delete(key);
           }
@@ -82,7 +82,7 @@ export async function updateMessage(
   const request = objectStore[type](_msg);
   return makeResp(request);
 }
-export async function deleteMessage(id: number) {
+export async function deleteMessage(id: string) {
   const db = await dbInstance;
   const transaction = db.transaction([MESSAGE_STORE], "readwrite");
   const objectStore = transaction.objectStore(MESSAGE_STORE);

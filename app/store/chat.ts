@@ -20,7 +20,7 @@ import { clearAudio } from "./audioStore";
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
   const date = new Date();
   return {
-    id: override.id || date.getTime(),
+    id: override.id || `${date.getTime()}`,
     date: date.toLocaleString(),
     role: "user",
     content: "",
@@ -47,7 +47,7 @@ export interface ChatSession {
   lastUpdate: number;
   lastSummarizeIndex: number;
   clearContextIndex?: number;
-  lastMsgId: number;
+  lastMsgId: number | string;
   msgCount: number;
 
   mask: Mask;

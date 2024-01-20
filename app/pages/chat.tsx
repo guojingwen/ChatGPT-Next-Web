@@ -74,7 +74,7 @@ import {
 import { api } from "../client/api";
 import { prettyObject } from "../utils/format";
 import { addAudio, getAudio, deleteAudio } from "../store/audioStore";
-import { sleep } from "openai/core";
+// import { sleep } from "openai/core";
 
 const device = getDeviceInfo();
 
@@ -353,11 +353,11 @@ export function ChatActions(props: {
         }}
       />
 
-      <ChatAction
+      {/* <ChatAction
         onClick={() => setShowModelSelector(true)}
         text={currentModel}
         icon={<RobotIcon />}
-      />
+      /> */}
       {device.isWeixin && (
         <ChatAction
           onClick={switchInputType}
@@ -404,7 +404,6 @@ function _Chat() {
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userInput, setUserInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const { submitKey, shouldSubmit } = useSubmitHandler();
   const { scrollRef, setAutoScroll, scrollDomToBottom } = useScrollToBottom();
   const [hitBottom, setHitBottom] = useState(true);
@@ -491,7 +490,7 @@ function _Chat() {
     }
   };
 
-  const doSubmit = (userInput: string) => {
+  const doSubmit = async (userInput: string) => {
     if (userInput.trim() === "") return;
     const matchCommand = chatCommands.match(userInput);
     if (matchCommand.matched) {
@@ -500,8 +499,7 @@ function _Chat() {
       matchCommand.invoke();
       return;
     }
-    setIsLoading(true);
-    onUserInput(userInput).then(() => setIsLoading(false));
+    await onUserInput(userInput);
     localStorage.setItem(LAST_INPUT_KEY, userInput);
     setUserInput("");
     setPromptHints([]);
@@ -517,7 +515,7 @@ function _Chat() {
       role: "user",
       content,
       sessionId: session.id,
-      id: now,
+      id: `${now}`,
     });
 
     const botMessage: ChatMessage = createMessage({
@@ -525,16 +523,14 @@ function _Chat() {
       streaming: true,
       model: modelConfig.model,
       sessionId: session.id,
-      id: now + 1,
+      id: `${now + 1}`,
     });
     setMessages(getMessages().concat([userMessage, botMessage]));
-
     await updateMessage(userMessage, "add");
     await updateMessage(botMessage, "add");
     chatStore.updateCurrentSession((session) => {
-      session.lastMsgId = botMessage.id;
+      session.lastMsgId = `${botMessage.id}`;
     });
-
     // make request
     const recentMessages = await chatStore.getMessagesWithMemory();
     const sendMessages = recentMessages.concat(userMessage);
@@ -557,7 +553,6 @@ function _Chat() {
           const lastMsg = { ...botMessage };
           const msgs = getMessages();
           setMessages(msgs.slice(0, msgs.length - 1).concat([lastMsg]));
-          await sleep(20);
           chatStore.onNewMessage(botMessage);
           if (inputType === "Voice") {
             toSpeak(botMessage);
@@ -610,7 +605,7 @@ function _Chat() {
   };
 
   // stop response
-  const onUserStop = (messageId: number) => {
+  const onUserStop = (messageId: string) => {
     ChatControllerPool.stop(session.id, messageId);
   };
 
@@ -656,7 +651,7 @@ function _Chat() {
   const onResend = async (message: ChatMessage) => {
     // 1. 删除当前(AI)消息 和前一条（用户）消息
     // 2. 重新发送
-    const messages = await getMessagesBySessionId(message.sessionId);
+    const messages = await getMessagesBySessionId(message.sessionId!);
     const resendingIndex = messages.findIndex((m) => m.id === message.id);
 
     const botMessage = messages[resendingIndex];
@@ -669,8 +664,7 @@ function _Chat() {
     if (botMessage.audioKey) {
       await deleteAudio(botMessage.audioKey);
     }
-    setIsLoading(true);
-    onUserInput(userMessage.content).then(() => setIsLoading(false));
+    await onUserInput(userMessage.content);
     inputRef.current?.focus();
   };
 
@@ -680,35 +674,20 @@ function _Chat() {
 
   // preview messages
   const renderMessages = useMemo(() => {
-    return context
-      .concat(messages as RenderMessage[])
-      .concat(
-        isLoading
-          ? [
-              {
-                ...createMessage({
-                  role: "assistant",
-                  content: "……",
-                }),
-                preview: true,
-              },
-            ]
-          : [],
-      )
-      .concat(
-        userInput.length > 0 && config.sendPreviewBubble
-          ? [
-              {
-                ...createMessage({
-                  role: "user",
-                  content: userInput,
-                }),
-                preview: true,
-              },
-            ]
-          : [],
-      );
-  }, [config.sendPreviewBubble, context, isLoading, messages, userInput]);
+    return context.concat(messages as RenderMessage[]).concat(
+      userInput.length > 0 && config.sendPreviewBubble
+        ? [
+            {
+              ...createMessage({
+                role: "user",
+                content: userInput,
+              }),
+              preview: true,
+            },
+          ]
+        : [],
+    );
+  }, [config.sendPreviewBubble, context, messages, userInput]);
 
   const [msgRenderIndex, _setMsgRenderIndex] = useState(
     Math.max(0, renderMessages.length - CHAT_PAGE_SIZE),
@@ -896,7 +875,7 @@ function _Chat() {
       }
       item.audioState = "playing";
       setMessages(getMessages().slice());
-      await audioInst.playIOS(audioIds, item);
+      await audioInst.playIOS(audioIds!, item);
       item.audioState = "done";
       setMessages(getMessages().slice());
     }
@@ -1029,8 +1008,8 @@ function _Chat() {
                     {isContext
                       ? Locale.Chat.IsContext
                       : config.showMsgTime
-                      ? message.date.toLocaleString()
-                      : null}
+                        ? message.date.toLocaleString()
+                        : null}
                   </div>
                 </div>
               </div>

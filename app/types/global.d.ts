@@ -1,5 +1,3 @@
-import Ffmpeg from "fluent-ffmpeg";
-
 declare module "*.jpg";
 declare module "*.png";
 declare module "*.woff2";
@@ -11,10 +9,6 @@ declare module "*.scss" {
 }
 
 declare module "*.svg";
-
-declare module "fluent-ffmpeg/lib/fluent-ffmpeg" {
-  export default Ffmpeg;
-}
 
 declare global {
   namespace NodeJS {

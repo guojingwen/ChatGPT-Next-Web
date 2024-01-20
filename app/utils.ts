@@ -143,7 +143,7 @@ export function getDeviceInfo(): DeviceInfo {
     const ua = navigator.userAgent;
     const uaL = ua.toLocaleLowerCase();
     window.devices = {
-      isAndroid: !/Android/.test(ua),
+      isAndroid: /Android/.test(ua),
       isIos: /iphone|ipad|ipod/.test(uaL),
       isMobile: /Android|iPhone/i.test(ua),
       isSafari: /^((?!chrome|android).)*safari/i.test(ua),

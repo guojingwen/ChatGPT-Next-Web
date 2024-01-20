@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import ffmpeg from "fluent-ffmpeg/lib/fluent-ffmpeg";
 import path from "path";
 import { SpeechTextParams } from "@/app/client/platforms/openai";
 import request from "request";
@@ -7,6 +6,7 @@ import fs from "fs";
 import { setTicket } from "../wx/wxService";
 import { JsTicket } from "@/app/types/global";
 import { ReplaceKeyByType } from "@/app/types/utils";
+const ffmpeg = require("fluent-ffmpeg/lib/fluent-ffmpeg");
 
 const client = new OpenAI({
   apiKey: process.env.API_KEY,
