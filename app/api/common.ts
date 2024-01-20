@@ -25,7 +25,7 @@ export async function requestOpenai(req: NextRequest) {
   );
 
   const fetchUrl = `${OPENAI_BASE_URL}/${path}`;
-  const fetchOptions: RequestInit = {
+  const fetchOptions: any = {
     agent,
     headers: {
       "Content-Type": "application/json",
@@ -39,18 +39,18 @@ export async function requestOpenai(req: NextRequest) {
     // @ts-ignore
     duplex: "half",
     signal: controller.signal,
-  } as any;
+  };
 
   try {
     const res = await fetch(fetchUrl, fetchOptions);
 
     // to prevent browser prompt for credentials
-    const newHeaders = new Headers(res.headers);
+    const newHeaders = new Headers(res.headers as any);
     newHeaders.delete("www-authenticate");
     // to disable nginx buffering
     newHeaders.set("X-Accel-Buffering", "no");
 
-    return new Response(res.body, {
+    return new Response(res.body as any, {
       status: res.status,
       statusText: res.statusText,
       headers: newHeaders,
