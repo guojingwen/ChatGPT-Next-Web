@@ -1,5 +1,10 @@
 import { NextRequest } from "next/server";
 import { OPENAI_BASE_URL } from "../constant";
+import { HttpsProxyAgent } from "https-proxy-agent";
+export const isProd = process.env.NODE_ENV === "production";
+export const agent = isProd
+  ? new HttpsProxyAgent("http://localhost:40000")
+  : undefined;
 
 export async function requestOpenai(req: NextRequest) {
   const controller = new AbortController();
@@ -20,6 +25,7 @@ export async function requestOpenai(req: NextRequest) {
 
   const fetchUrl = `${OPENAI_BASE_URL}/${path}`;
   const fetchOptions: RequestInit = {
+    agent,
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
@@ -32,7 +38,7 @@ export async function requestOpenai(req: NextRequest) {
     // @ts-ignore
     duplex: "half",
     signal: controller.signal,
-  };
+  } as any;
 
   try {
     const res = await fetch(fetchUrl, fetchOptions);
@@ -52,3 +58,5 @@ export async function requestOpenai(req: NextRequest) {
     clearTimeout(timeoutId);
   }
 }
+
+export const runtime = "nodejs";

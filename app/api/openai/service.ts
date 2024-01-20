@@ -6,6 +6,7 @@ import fs from "fs";
 import { setTicket } from "../wx/wxService";
 import { JsTicket } from "@/app/types/global";
 import { ReplaceKeyByType } from "@/app/types/utils";
+import { agent } from "../common";
 const ffmpeg = require("fluent-ffmpeg/lib/fluent-ffmpeg");
 
 const client = new OpenAI({
@@ -16,7 +17,9 @@ const client = new OpenAI({
 export async function apiSpeechToText(
   params: SpeechTextParams,
 ): Promise<Uint8Array[]> {
-  const audio: any = await client.audio.speech.create(params);
+  const audio: any = await client.audio.speech.create(params, {
+    httpAgent: agent,
+  });
   /**
    * 注意 ubuntu 要安装 ffmpeg
    * 参考 https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues/442
@@ -40,7 +43,9 @@ export async function apiSpeechToText(
 export async function apiSpeechToText2(
   params: SpeechTextParams,
 ): Promise<string> {
-  const audio: any = await client.audio.speech.create(params);
+  const audio: any = await client.audio.speech.create(params, {
+    httpAgent: agent,
+  });
   const fileName = `${Date.now()}.mp3`;
   const filePath = path.join(process.cwd(), `./files/${fileName}`);
 
@@ -149,3 +154,5 @@ export async function splitAudio(
       .run();
   });
 }
+
+export const runtime = "nodejs";

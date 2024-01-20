@@ -1,7 +1,3 @@
-export const OWNER = "Yidadaa";
-export const REPO = "ChatGPT-Next-Web";
-export const RUNTIME_CONFIG_DOM = "danger-runtime-config";
-
 export const OPENAI_BASE_URL = "https://api.openai.com";
 
 export enum Path {
