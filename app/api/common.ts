@@ -1,3 +1,4 @@
+import fetch from "node-fetch";
 import { NextRequest } from "next/server";
 import { OPENAI_BASE_URL } from "../constant";
 import { HttpsProxyAgent } from "https-proxy-agent";
