@@ -74,6 +74,7 @@ import {
 import { api } from "../client/api";
 import { prettyObject } from "../utils/format";
 import { addAudio, getAudio, deleteAudio } from "../store/audioStore";
+import { sleep } from "../utils/sync";
 // import { sleep } from "openai/core";
 
 const device = getDeviceInfo();
@@ -555,7 +556,7 @@ function _Chat() {
           setMessages(msgs.slice(0, msgs.length - 1).concat([lastMsg]));
           chatStore.onNewMessage(botMessage);
           if (inputType === "Voice") {
-            toSpeak(botMessage);
+            toSpeak(lastMsg);
           }
         }
         ChatControllerPool.remove(session.id, botMessage.id);
@@ -832,11 +833,7 @@ function _Chat() {
     const old = audioInst.getAddi() as RenderMessage;
     if (old) {
       audioInst.stop();
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(null);
-        }, 20);
-      });
+      await sleep(20);
       const newList = getMessages().slice();
       const index = newList.findIndex((it) => it.id === old.id);
       newList.splice(index, 1, {
