@@ -1,35 +1,20 @@
-FROM node:18-alpine AS base
+FROM  node:20-alpine
 
-FROM base AS deps
+# 替换为中国大陆的镜像源
+RUN echo http://mirrors.ustc.edu.cn/alpine/v3.12/main > /etc/apk/repositories; \
+    echo http://mirrors.ustc.edu.cn/alpine/v3.12/community >> /etc/apk/repositories
+# 更新软件包索引
+RUN apk update
+# 安装 tzdata 包
+RUN apk add --no-cache tzdata
+# 设置时区
+ENV TZ=Asia/Shanghai
 
-RUN apk add --no-cache libc6-compat
+WORKDIR /usr/ai_teacher
 
-WORKDIR /app
+#RUN npm config set registry https://registry.npm.taobao.org/
+#RUN npm i -g next@14.0.4 http-server
+COPY ./ /usr/ai_teacher/
+EXPOSE 3002
 
-COPY package.json yarn.lock ./
-
-RUN yarn config set registry 'https://registry.npmmirror.com/'
-RUN yarn install
-
-FROM base AS builder
-
-RUN apk update && apk add --no-cache git
-
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-RUN yarn build
-
-FROM base AS runner
-WORKDIR /app
-
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/.next/server ./.next/server
-
-EXPOSE 3000
-
-CMD node server.js
+ENTRYPOINT ["npm", "start"]
